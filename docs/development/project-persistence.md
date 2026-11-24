@@ -8,6 +8,9 @@ Varsayılan: repository root içindeki `data/app.sqlite3`.
 
 Özel yerel konum için `UVE_DATA_DIR` ortam değişkeni kullanılabilir. `data/` Git'e eklenmez.
 
+## SQLite migration sistemi
+`schema_migrations` tablosu, uygulanan veritabanı sürümünü ve zamanını kaydeder. Migration 1 başlangıç proje tablosunu ve güncelleme indeksini oluşturur. Gelecekteki şema değişiklikleri yeni, sıralı migration kayıtları olarak eklenmelidir. Var olan ilk tablo yapısı için başlangıç migration'ı `IF NOT EXISTS` kullanır.
+
 ## HTTP API
 - `GET /api/v1/health`: API ve SQLite kontrolü
 - `GET /api/v1/projects`: proje özetleri
