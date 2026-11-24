@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { isProjectManifest } from "@uve/core";
-import type { OutputKind, ProjectManifest, VideoOrientation } from "@uve/core";
+import type { OutputKind, OutputSettings, ProjectManifest, VideoOrientation } from "@uve/core";
 
 const API = "http://127.0.0.1:8000/api/v1";
 
@@ -24,8 +24,11 @@ function App() {
   const [title, setTitle] = useState("");
   const [promptMode, setPromptMode] = useState<PromptMode>("topic");
   const [promptText, setPromptText] = useState("");
+  const [outputKind, setOutputKind] = useState<OutputKind>("video");
   const [format, setFormat] = useState("mp4");
   const [orientation, setOrientation] = useState<VideoOrientation>("landscape");
+  const [sampleRate, setSampleRate] = useState(48000);
+  const [channels, setChannels] = useState(2);
   const [width, setWidth] = useState(1920);
   const [height, setHeight] = useState(1080);
   const [fps, setFps] = useState(30);
@@ -80,6 +83,11 @@ function App() {
     setMessage("");
     const timestamp = now();
     const id = crypto.randomUUID();
+    const output: OutputSettings = outputKind === "audio"
+      ? { kind: "audio", format, sampleRate, channels }
+      : outputKind === "image"
+        ? { kind: "image", format, orientation, width, height }
+        : { kind: outputKind, format, orientation, width, height, fps };
     const manifest: ProjectManifest = {
       schemaVersion: 1,
       id,
@@ -96,14 +104,7 @@ function App() {
       prompt: promptMode === "topic"
         ? { mode: "topic", topic: promptText.trim() }
         : { mode: "ready_prompt", originalText: promptText },
-      output: {
-        kind: "video" as OutputKind,
-        format,
-        orientation,
-        width,
-        height,
-        fps,
-      },
+      output,
       assets: [],
       timeline: { durationMs: 0, tracks: [] },
     };
@@ -212,27 +213,53 @@ function App() {
           </label>
           <div className="form-section-title">Çıktı ayarları</div>
           <div className="settings-grid">
+            <label>Çıktı türü
+              <select value={outputKind} onChange={(event) => {
+                const next = event.target.value as OutputKind;
+                setOutputKind(next);
+                setFormat(next === "video" ? "mp4" : next === "audio" ? "mp3" : next === "image" ? "png" : "gif");
+              }}>
+                <option value="video">Video</option><option value="audio">Ses</option><option value="image">Görsel</option><option value="animation">Animasyon</option>
+              </select>
+            </label>
             <label>Format
               <select value={format} onChange={(event) => setFormat(event.target.value)}>
-                <option value="mp4">MP4</option><option value="mov">MOV</option><option value="webm">WebM</option>
+                {outputKind === "video" && <><option value="mp4">MP4</option><option value="mov">MOV</option><option value="webm">WebM</option></>}
+                {outputKind === "audio" && <><option value="mp3">MP3</option><option value="wav">WAV</option><option value="aac">AAC</option><option value="flac">FLAC</option></>}
+                {outputKind === "image" && <><option value="png">PNG</option><option value="jpg">JPG</option><option value="webp">WebP</option></>}
+                {outputKind === "animation" && <><option value="gif">GIF</option><option value="webp">Animated WebP</option></>}
               </select>
             </label>
-            <label>Görüntü yönü
-              <select value={orientation} onChange={(event) => setOrientation(event.target.value as VideoOrientation)}>
-                <option value="landscape">Yatay 16:9</option><option value="portrait">Dikey 9:16</option><option value="square">Kare 1:1</option>
-              </select>
-            </label>
-            <label>Genişlik
-              <input type="number" min={256} max={7680} value={width} onChange={(event) => setWidth(Number(event.target.value))} />
-            </label>
-            <label>Yükseklik
-              <input type="number" min={256} max={7680} value={height} onChange={(event) => setHeight(Number(event.target.value))} />
-            </label>
-            <label>FPS
+            {outputKind !== "audio" && <>
+              <label>Görüntü yönü
+                <select value={orientation} onChange={(event) => setOrientation(event.target.value as VideoOrientation)}>
+                  <option value="landscape">Yatay 16:9</option><option value="portrait">Dikey 9:16</option><option value="square">Kare 1:1</option>
+                </select>
+              </label>
+              <label>Genişlik
+                <input type="number" min={1} max={7680} value={width} onChange={(event) => setWidth(Number(event.target.value))} />
+              </label>
+              <label>Yükseklik
+                <input type="number" min={1} max={7680} value={height} onChange={(event) => setHeight(Number(event.target.value))} />
+              </label>
+            </>}
+            {(outputKind === "video" || outputKind === "animation") && <label>FPS
               <select value={fps} onChange={(event) => setFps(Number(event.target.value))}>
-                <option value={24}>24</option><option value={25}>25</option><option value={30}>30</option><option value={50}>50</option><option value={60}>60</option>
+                <option value={12}>12</option><option value={24}>24</option><option value={25}>25</option><option value={30}>30</option><option value={50}>50</option><option value={60}>60</option>
               </select>
-            </label>
+            </label>}
+            {outputKind === "audio" && <>
+              <label>Örnekleme hızı
+                <select value={sampleRate} onChange={(event) => setSampleRate(Number(event.target.value))}>
+                  <option value={44100}>44.1 kHz</option><option value={48000}>48 kHz</option><option value={96000}>96 kHz</option>
+                </select>
+              </label>
+              <label>Kanal
+                <select value={channels} onChange={(event) => setChannels(Number(event.target.value))}>
+                  <option value={1}>Mono</option><option value={2}>Stereo</option>
+                </select>
+              </label>
+            </>}
           </div>
           <button className="primary-button" type="submit" disabled={busy || apiState !== "online"}>{busy ? "İşleniyor..." : "Projeyi oluştur ve kaydet"}</button>
         </form>
@@ -261,7 +288,7 @@ function App() {
           <div className="section-heading"><div><p className="eyebrow">03 / OPEN PROJECT</p><h2>{selected.title}</h2></div><button className="quiet-button" onClick={() => setSelected(null)}>Kapat</button></div>
           <div className="details-grid">
             <div><small>Proje kimliği</small><code>{selected.id}</code></div>
-            <div><small>Çıktı</small><strong>{selected.manifest.output.format.toUpperCase()} · {selected.manifest.output.width}×{selected.manifest.output.height} · {selected.manifest.output.fps} FPS</strong></div>
+            <div><small>Çıktı</small><strong>{selected.manifest.output.kind.toUpperCase()} · {selected.manifest.output.format.toUpperCase()}{selected.manifest.output.kind === "audio" ? ` · ${selected.manifest.output.sampleRate} Hz · ${selected.manifest.output.channels} kanal` : ` · ${selected.manifest.output.width}×${selected.manifest.output.height}`}{(selected.manifest.output.kind === "video" || selected.manifest.output.kind === "animation") ? ` · ${selected.manifest.output.fps} FPS` : ""}</strong></div>
             <div><small>Prompt modu</small><strong>{selected.manifest.prompt?.mode === "ready_prompt" ? "Hazır prompt" : "Konu"}</strong></div>
             <div><small>Medya / Timeline</small><strong>{selected.manifest.assets.length} medya · {selected.manifest.timeline.tracks.length} kanal</strong></div>
           </div>
