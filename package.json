@@ -8,6 +8,8 @@
   ],
   "scripts": {
     "dev": "npm run dev --workspace @uve/web",
-    "build": "npm run build --workspace @uve/web"
+    "build": "npm run typecheck:core && npm run build --workspace @uve/web",
+    "typecheck:core": "npm run typecheck --workspace @uve/core",
+    "test:api": "python -m pytest -q backend/tests"
   }
 }
