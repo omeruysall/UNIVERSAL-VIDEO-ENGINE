@@ -5,19 +5,22 @@
 - [x] React + TypeScript arayüz iskeleti
 - [x] FastAPI yerel API iskeleti
 - [x] Mobil + PC özellik eşitliği mimari kararı
-- [ ] SQLite bağlantısı ve migration yaklaşımı
+- [x] SQLite ile ilk proje kayıt tablosu ve CRUD altyapısı (kodlandı; cihaz testi bekliyor)
+- [ ] SQLite migration/version yönetimi
 - [ ] Yerel sağlık kontrolünün cihazda doğrulanması
 - [ ] Android/Termux geliştirme ortamı doğrulaması
 - [ ] Masaüstü geliştirme ortamında kurulum doğrulaması
 
 ## MVP-1 — Shared Core & Project
-- [ ] Platformdan bağımsız TypeScript Shared Core
-- [ ] Sürümlü ortak proje manifesti ve JSON şeması
-- [ ] Proje oluşturma/listeleme/açma
-- [ ] Konu ve hazır prompt modları
-- [ ] Hazır prompt metninin birebir korunması
-- [ ] Video çıktı türü, format, yön, çözünürlük ve FPS ayarları
-- [ ] Proje manifestinin mobil ve masaüstünde aynı şekilde okunması
+- [x] Platformdan bağımsız TypeScript proje manifesti
+- [x] Manifest için ilk runtime doğrulayıcı
+- [ ] JSON Schema ve manifest migration sistemi
+- [x] Proje oluşturma/listeleme/açma API ve arayüzü (kodlandı; cihaz testi bekliyor)
+- [x] Konu ve hazır prompt modları
+- [x] Hazır prompt metnini dönüştürmeden saklama
+- [x] Video formatı, yön, çözünürlük ve FPS ayarları
+- [ ] Proje manifestinin mobil ve masaüstünde aynı şekilde açılması ve kabul testi
+- [ ] Proje güncelleme akışının arayüze eklenmesi
 
 ## MVP-2 — Local Assets & Timeline
 - [ ] Platform dosya sistemi adaptörleri
