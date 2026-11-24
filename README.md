@@ -23,6 +23,7 @@ Mobil ve PC için ayrı ürün mantıkları oluşturulmayacak. Responsive arayü
 
 ## Mevcut kod kapsamı
 - Yerel API sağlık kontrolü
+- Sürümlü SQLite migration altyapısı (ilk migration)
 - SQLite proje kayıt tablosu
 - Proje oluşturma, listeleme, tekil proje okuma, güncelleme ve silme API uçları
 - Proje oluşturma arayüzü
@@ -69,6 +70,7 @@ Mobil ve PC için ayrı ürün mantıkları oluşturulmayacak. Responsive arayü
 - packages/core/schema/project-manifest.v1.schema.json
 - docs/development/local-first.md
 - docs/development/project-persistence.md
+- docs/development/local-testing.md
 - docs/roadmap/mvp.md
 - docs/security/local-security.md
 
