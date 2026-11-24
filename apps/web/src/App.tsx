@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import type { FormEvent } from "react";
+import { isProjectManifest } from "@uve/core";
 import type { OutputKind, ProjectManifest, VideoOrientation } from "@uve/core";
 
 const API = "http://127.0.0.1:8000/api/v1";
@@ -108,6 +109,9 @@ function App() {
     };
 
     try {
+      if (!isProjectManifest(manifest)) {
+        throw new Error("Proje verisi ortak proje şemasından geçemedi.");
+      }
       const response = await fetch(`${API}/projects`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
