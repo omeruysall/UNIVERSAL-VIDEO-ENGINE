@@ -86,6 +86,39 @@ def validate_project(payload: ProjectWrite) -> str:
         raise HTTPException(status_code=422, detail="assets must be an array")
     if not isinstance(payload.manifest["timeline"], dict):
         raise HTTPException(status_code=422, detail="timeline must be an object")
+
+    languages = payload.manifest["languages"]
+    language_arrays = ("voiceover", "subtitles", "onScreenText", "metadata")
+    if not isinstance(languages, dict) or not isinstance(languages.get("video"), str):
+        raise HTTPException(status_code=422, detail="languages.video must be a string")
+    if any(
+        not isinstance(languages.get(key), list)
+        or not all(isinstance(item, str) for item in languages[key])
+        for key in language_arrays
+    ):
+        raise HTTPException(status_code=422, detail="Language selections must be string arrays")
+
+    output = payload.manifest["output"]
+    if not isinstance(output, dict) or not isinstance(output.get("format"), str):
+        raise HTTPException(status_code=422, detail="output and output.format are required")
+    output_kind = output.get("kind")
+    if output_kind == "audio":
+        if not isinstance(output.get("sampleRate"), int) or output["sampleRate"] <= 0:
+            raise HTTPException(status_code=422, detail="Audio sampleRate must be a positive integer")
+        if not isinstance(output.get("channels"), int) or output["channels"] <= 0:
+            raise HTTPException(status_code=422, detail="Audio channels must be a positive integer")
+    elif output_kind in ("video", "image", "animation"):
+        if output.get("orientation") not in ("landscape", "portrait", "square", "custom"):
+            raise HTTPException(status_code=422, detail="Invalid output orientation")
+        for dimension in ("width", "height"):
+            if not isinstance(output.get(dimension), int) or output[dimension] <= 0:
+                raise HTTPException(status_code=422, detail=f"output.{dimension} must be a positive integer")
+        if output_kind in ("video", "animation"):
+            if not isinstance(output.get("fps"), (int, float)) or output["fps"] <= 0:
+                raise HTTPException(status_code=422, detail="Video/animation fps must be positive")
+    else:
+        raise HTTPException(status_code=422, detail="Unsupported output kind")
+
     return project_id
 
 
