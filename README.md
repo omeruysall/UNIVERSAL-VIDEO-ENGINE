@@ -66,6 +66,7 @@ Mobil ve PC için ayrı ürün mantıkları oluşturulmayacak. Responsive arayü
 ## Dokümantasyon
 - docs/architecture/overview.md
 - docs/architecture/platform-parity.md
+- packages/core/schema/project-manifest.v1.schema.json
 - docs/development/local-first.md
 - docs/development/project-persistence.md
 - docs/roadmap/mvp.md
