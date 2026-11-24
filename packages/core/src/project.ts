@@ -11,14 +11,36 @@ export type VideoOrientation =
   | "square"
   | "custom";
 
-export interface OutputSettings {
-  kind: OutputKind;
-  format: string;
-  orientation: VideoOrientation;
-  width: number;
-  height: number;
-  fps: number;
-}
+export type OutputSettings =
+  | {
+      kind: "video";
+      format: string;
+      orientation: VideoOrientation;
+      width: number;
+      height: number;
+      fps: number;
+    }
+  | {
+      kind: "animation";
+      format: string;
+      orientation: VideoOrientation;
+      width: number;
+      height: number;
+      fps: number;
+    }
+  | {
+      kind: "image";
+      format: string;
+      orientation: VideoOrientation;
+      width: number;
+      height: number;
+    }
+  | {
+      kind: "audio";
+      format: string;
+      sampleRate: number;
+      channels: number;
+    };
 
 export interface ProjectLanguages {
   /** Main language of the project/video. */
@@ -130,15 +152,25 @@ export function isProjectManifest(value: unknown): value is ProjectManifest {
   ) return false;
 
   const output = value.output;
-  if (!isRecord(output)) return false;
-  if (
-    !["video", "audio", "image", "animation"].includes(String(output.kind)) ||
-    typeof output.format !== "string" ||
-    !["landscape", "portrait", "square", "custom"].includes(String(output.orientation)) ||
-    typeof output.width !== "number" || !Number.isFinite(output.width) || output.width <= 0 ||
-    typeof output.height !== "number" || !Number.isFinite(output.height) || output.height <= 0 ||
-    typeof output.fps !== "number" || !Number.isFinite(output.fps) || output.fps <= 0
-  ) return false;
+  if (!isRecord(output) || typeof output.format !== "string") return false;
+  if (output.kind === "audio") {
+    if (
+      typeof output.sampleRate !== "number" || output.sampleRate <= 0 ||
+      typeof output.channels !== "number" || output.channels <= 0
+    ) return false;
+  } else if (output.kind === "video" || output.kind === "animation" || output.kind === "image") {
+    if (
+      !["landscape", "portrait", "square", "custom"].includes(String(output.orientation)) ||
+      typeof output.width !== "number" || !Number.isFinite(output.width) || output.width <= 0 ||
+      typeof output.height !== "number" || !Number.isFinite(output.height) || output.height <= 0
+    ) return false;
+    if (
+      (output.kind === "video" || output.kind === "animation") &&
+      (typeof output.fps !== "number" || !Number.isFinite(output.fps) || output.fps <= 0)
+    ) return false;
+  } else {
+    return false;
+  }
 
   if (!Array.isArray(value.assets)) return false;
   const timeline = value.timeline;
