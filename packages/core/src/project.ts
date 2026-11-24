@@ -144,7 +144,7 @@ export function isProjectManifest(value: unknown): value is ProjectManifest {
   const languages = value.languages;
   if (!isRecord(languages)) return false;
   if (
-    typeof languages.video !== "string" ||
+    typeof languages.video !== "string" || languages.video.trim().length === 0 ||
     !isStringArray(languages.voiceover) ||
     !isStringArray(languages.subtitles) ||
     !isStringArray(languages.onScreenText) ||
