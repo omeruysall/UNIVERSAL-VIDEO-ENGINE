@@ -1,0 +1,30 @@
+# Yerel Proje Kaydı
+
+## Amaç
+İlk proje yönetimi akışı, kullanıcı projesini yerel SQLite veritabanında saklar. Bu API geliştirme aşamasında localhost üzerinden kullanılır. Üretim mobil uygulaması daha sonra aynı veri sözleşmesini native SQLite adaptörüyle uygulayacaktır; Termux/Python mobil dağıtımın zorunlu parçası değildir.
+
+## Veri konumu
+Varsayılan: repository root içindeki `data/app.sqlite3`.
+
+Özel yerel konum için `UVE_DATA_DIR` ortam değişkeni kullanılabilir. `data/` Git'e eklenmez.
+
+## HTTP API
+- `GET /api/v1/health`: API ve SQLite kontrolü
+- `GET /api/v1/projects`: proje özetleri
+- `POST /api/v1/projects`: yeni proje kaydı
+- `GET /api/v1/projects/{id}`: manifest dahil proje kaydı
+- `PUT /api/v1/projects/{id}`: proje manifestini güncelle
+- `DELETE /api/v1/projects/{id}`: proje kaydını sil
+
+Yazma uçları manifestin şema sürümünü, kimliğini ve zorunlu üst düzey alanlarını kontrol eder. Shared Core tarafında `isProjectManifest` runtime guard bulunur.
+
+## Hazır prompt bütünlüğü
+`ready_prompt` modunda girilen metin `prompt.originalText` alanına aktarılır. Bu alan trim, otomatik düzeltme, çeviri veya prompt yeniden yazımı işlemine sokulmaz. Konu modunda konu metni ayrı `prompt.topic` alanında tutulur. Smart Prompt Engine daha sonra ayrı bir `generatedPrompt` alanı üretebilir; kaynak konu ve hazır prompt alanı üzerine yazmamalıdır.
+
+## Şimdiki sınırlar
+- İlk SQLite tablosu otomatik oluşturulur; sürümlü migration altyapısı henüz yoktur.
+- Proje güncelleme API'si mevcut; arayüzde düzenleme/kaydetme akışı henüz yoktur.
+- Medya dosyaları henüz kopyalanmıyor veya yönetilmiyor.
+- Silme işlemi yalnızca proje veritabanı kaydını siler; medya dosyası temizliği henüz uygulanmadı.
+- Proje paketini dışa aktarma/içe aktarma ve platformlar arası taşıma henüz yoktur.
+- API ve UI kodu henüz gerçek cihazda çalıştırılıp test edilmedi.
