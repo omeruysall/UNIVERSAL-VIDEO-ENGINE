@@ -18,6 +18,9 @@ Varsayılan: repository root içindeki `data/app.sqlite3`.
 
 Yazma uçları manifestin şema sürümünü, kimliğini ve zorunlu üst düzey alanlarını kontrol eder. Shared Core tarafında `isProjectManifest` runtime guard bulunur.
 
+## Bağımsız çoklu dil alanları
+Proje manifesti; ana video dili, seslendirme dilleri, altyazı dilleri, ekrandaki metin dilleri ve başlık/açıklama (metadata) dillerini ayrı saklar. Arayüzde birden fazla dil virgülle ayrılarak girilebilir; alanlar birbirinden bağımsızdır. Bu aşamada dil seçimi ve kaydı vardır; çeviri, dublaj, ses üretimi ve altyazı üretim motorları henüz eklenmemiştir.
+
 ## Hazır prompt bütünlüğü
 `ready_prompt` modunda girilen metin `prompt.originalText` alanına aktarılır. Bu alan trim, otomatik düzeltme, çeviri veya prompt yeniden yazımı işlemine sokulmaz. Konu modunda konu metni ayrı `prompt.topic` alanında tutulur. Smart Prompt Engine daha sonra ayrı bir `generatedPrompt` alanı üretebilir; kaynak konu ve hazır prompt alanı üzerine yazmamalıdır.
 
