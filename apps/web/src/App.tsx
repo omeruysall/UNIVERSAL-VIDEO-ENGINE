@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import type { FormEvent } from "react";
 import type { OutputKind, ProjectManifest, VideoOrientation } from "@uve/core";
 
 const API = "http://127.0.0.1:8000/api/v1";
@@ -64,7 +65,7 @@ function App() {
     }
   }, [orientation]);
 
-  async function createProject(event: React.FormEvent<HTMLFormElement>) {
+  async function createProject(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!title.trim()) {
       setMessage("Proje adı gerekli.");
