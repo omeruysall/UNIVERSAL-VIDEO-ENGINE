@@ -31,6 +31,8 @@ legend{margin-bottom:9px;color:#cbd4e2;font-size:12px;font-weight:650}
 .choice{display:flex;align-items:center;gap:8px;padding:10px 13px;border:1px solid #354258;border-radius:9px;color:#aebbd0;font-size:12px}
 .choice.active{border-color:#6684b4;background:#1c2a40;color:#e4edff}
 .settings-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.language-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.language-grid label{display:grid;gap:8px;color:#cbd4e2;font-size:12px;font-weight:650}
 .form-section-title{margin-bottom:-8px;color:#9eb2d2;font-size:12px;font-weight:750;letter-spacing:.6px}
 .primary-button,.secondary-button,.quiet-button{border:1px solid #49658f;border-radius:9px;padding:11px 15px;background:#29436a;color:#fff;font-size:12px;font-weight:700;cursor:pointer}
 .primary-button{justify-self:start;min-width:220px}
@@ -51,4 +53,4 @@ legend{margin-bottom:9px;color:#cbd4e2;font-size:12px;font-weight:650}
 .prompt-preview{margin-top:14px;padding:14px;border:1px solid #2c394c;border-radius:9px}
 .prompt-preview p{white-space:pre-wrap;overflow-wrap:anywhere;color:#c6d0df;font-size:12px;line-height:1.6}
 footer{display:flex;justify-content:space-between;gap:16px;margin-top:28px;padding-top:18px;border-top:1px solid #293140;color:#77869e;font-size:10px}
-@media(max-width:680px){.shell{width:min(100% - 28px,520px);padding-top:18px}.hero{padding:42px 0 26px}.hero h2{letter-spacing:-1.8px}.workspace{padding:17px}.settings-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.details-grid{grid-template-columns:1fr}.project-row{align-items:flex-start;flex-direction:column}.row-actions{width:100%}.row-actions button{flex:1}footer{flex-direction:column}.status-address{margin-left:auto}}
+@media(max-width:680px){.shell{width:min(100% - 28px,520px);padding-top:18px}.hero{padding:42px 0 26px}.hero h2{letter-spacing:-1.8px}.workspace{padding:17px}.settings-grid,.language-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.details-grid{grid-template-columns:1fr}.project-row{align-items:flex-start;flex-direction:column}.row-actions{width:100%}.row-actions button{flex:1}footer{flex-direction:column}.status-address{margin-left:auto}}
