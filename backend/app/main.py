@@ -1,6 +1,7 @@
 import json
 import os
 import sqlite3
+from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 from uuid import UUID
@@ -27,8 +28,21 @@ def get_connection() -> sqlite3.Connection:
     return connection
 
 
+@contextmanager
+def db_session():
+    connection = get_connection()
+    try:
+        yield connection
+        connection.commit()
+    except Exception:
+        connection.rollback()
+        raise
+    finally:
+        connection.close()
+
+
 def initialize_database() -> None:
-    with get_connection() as connection:
+    with db_session() as connection:
         connection.execute(
             """
             CREATE TABLE IF NOT EXISTS projects (
@@ -101,7 +115,7 @@ def startup() -> None:
 @app.get("/api/v1/health")
 def health() -> dict:
     initialize_database()
-    with get_connection() as connection:
+    with db_session() as connection:
         connection.execute("SELECT 1")
     return {
         "status": "ok",
@@ -115,7 +129,7 @@ def health() -> dict:
 @app.get("/api/v1/projects")
 def list_projects() -> list[dict]:
     initialize_database()
-    with get_connection() as connection:
+    with db_session() as connection:
         rows = connection.execute(
             """
             SELECT id, title, created_at, updated_at
@@ -134,7 +148,7 @@ def create_project(payload: ProjectWrite) -> dict:
     manifest_json = json.dumps(payload.manifest, ensure_ascii=False, separators=(",", ":"))
 
     try:
-        with get_connection() as connection:
+        with db_session() as connection:
             connection.execute(
                 """
                 INSERT INTO projects (id, title, manifest_json, created_at, updated_at)
@@ -161,7 +175,7 @@ def get_project(project_id: str) -> dict:
     except ValueError as exc:
         raise HTTPException(status_code=422, detail="Invalid project id") from exc
 
-    with get_connection() as connection:
+    with db_session() as connection:
         row = connection.execute(
             "SELECT * FROM projects WHERE id = ?", (normalized_id,)
         ).fetchone()
@@ -192,7 +206,7 @@ def update_project(project_id: str, payload: ProjectWrite) -> dict:
     manifest_json = json.dumps(payload.manifest, ensure_ascii=False, separators=(",", ":"))
     updated_at = payload.manifest["updatedAt"]
 
-    with get_connection() as connection:
+    with db_session() as connection:
         cursor = connection.execute(
             """
             UPDATE projects
@@ -220,7 +234,7 @@ def delete_project(project_id: str) -> None:
     except ValueError as exc:
         raise HTTPException(status_code=422, detail="Invalid project id") from exc
 
-    with get_connection() as connection:
+    with db_session() as connection:
         cursor = connection.execute("DELETE FROM projects WHERE id = ?", (normalized_id,))
         if cursor.rowcount == 0:
             raise HTTPException(status_code=404, detail="Project not found")
