@@ -21,6 +21,14 @@ Yazma uçları manifestin şema sürümünü, kimliğini ve zorunlu üst düzey 
 ## Hazır prompt bütünlüğü
 `ready_prompt` modunda girilen metin `prompt.originalText` alanına aktarılır. Bu alan trim, otomatik düzeltme, çeviri veya prompt yeniden yazımı işlemine sokulmaz. Konu modunda konu metni ayrı `prompt.topic` alanında tutulur. Smart Prompt Engine daha sonra ayrı bir `generatedPrompt` alanı üretebilir; kaynak konu ve hazır prompt alanı üzerine yazmamalıdır.
 
+## Çıktı profilleri
+- Video: MP4, MOV veya WebM; yön, çözünürlük ve FPS.
+- Ses: MP3, WAV, AAC veya FLAC; örnekleme hızı ve kanal sayısı.
+- Görsel: PNG, JPG veya WebP; yön ve çözünürlük.
+- Animasyon: GIF veya animasyonlu WebP; yön, çözünürlük ve FPS.
+
+Bu seçimler proje manifestine kaydedilir. Henüz bu profillerden gerçek medya dosyası üreten render motoru eklenmemiştir.
+
 ## Şimdiki sınırlar
 - İlk SQLite tablosu otomatik oluşturulur; sürümlü migration altyapısı henüz yoktur.
 - Proje güncelleme API'si mevcut; arayüzde düzenleme/kaydetme akışı henüz yoktur.
