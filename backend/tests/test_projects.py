@@ -50,6 +50,7 @@ def test_health_reports_local_sqlite(client):
     assert response.status_code == 200
     assert response.json()["mode"] == "local"
     assert response.json()["database"] == "sqlite"
+    assert response.json()["database_schema_version"] == 1
 
 
 def test_project_create_read_update_delete(client):
