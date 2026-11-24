@@ -7,7 +7,7 @@ Yerel öncelikli, modüler video üretim ve düzenleme platformu.
 **Geliştirme ilkesi:** Temel işlevler kullanıcının kendi cihazında çalışır. Zorunlu bulut sunucusu, bulut veritabanı veya bulut medya depolama yoktur. GitHub yalnızca kaynak kodu, dokümantasyon ve sürüm yönetimi içindir.
 
 ## Proje durumu
-- Aşama: V5.5 — Local Project Persistence & Output Profiles
+- Aşama: V5.6 — Local Persistence, Migrations & API Test Foundation
 - Ortak arayüz: React + TypeScript
 - Ortak proje modeli ve runtime guard: `packages/core`
 - Yerel geliştirme API'si: Python + FastAPI
