@@ -19,6 +19,7 @@
 - [x] Konu ve hazır prompt modları
 - [x] Hazır prompt metnini dönüştürmeden saklama
 - [x] Video/ses/görsel/animasyon çıktı türü ve türe uygun format/teknik ayarlar
+- [x] Ana video, seslendirme, altyazı, ekran yazısı ve metadata için bağımsız çoklu dil alanları
 - [ ] Proje manifestinin mobil ve masaüstünde aynı şekilde açılması ve kabul testi
 - [ ] Proje güncelleme akışının arayüze eklenmesi
 
