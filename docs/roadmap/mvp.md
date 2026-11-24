@@ -18,7 +18,7 @@
 - [x] Proje oluşturma/listeleme/açma API ve arayüzü (kodlandı; cihaz testi bekliyor)
 - [x] Konu ve hazır prompt modları
 - [x] Hazır prompt metnini dönüştürmeden saklama
-- [x] Video formatı, yön, çözünürlük ve FPS ayarları
+- [x] Video/ses/görsel/animasyon çıktı türü ve türe uygun format/teknik ayarlar
 - [ ] Proje manifestinin mobil ve masaüstünde aynı şekilde açılması ve kabul testi
 - [ ] Proje güncelleme akışının arayüze eklenmesi
 
