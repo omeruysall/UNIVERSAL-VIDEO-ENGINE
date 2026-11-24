@@ -89,7 +89,7 @@ def validate_project(payload: ProjectWrite) -> str:
 
     languages = payload.manifest["languages"]
     language_arrays = ("voiceover", "subtitles", "onScreenText", "metadata")
-    if not isinstance(languages, dict) or not isinstance(languages.get("video"), str):
+    if not isinstance(languages, dict) or not isinstance(languages.get("video"), str) or not languages["video"].strip():
         raise HTTPException(status_code=422, detail="languages.video must be a string")
     if any(
         not isinstance(languages.get(key), list)
