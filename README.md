@@ -7,12 +7,11 @@ Yerel öncelikli, modüler video üretim ve düzenleme platformu.
 **Geliştirme ilkesi:** Temel işlevler kullanıcının kendi cihazında çalışır. Zorunlu bulut sunucusu, bulut veritabanı veya bulut medya depolama yoktur. GitHub yalnızca kaynak kodu, dokümantasyon ve sürüm yönetimi içindir.
 
 ## Proje durumu
-- Aşama: V5.4 — Cross-Platform Feature Parity Architecture
-- İlk geliştirme ortamı: Android/Termux veya masaüstü bilgisayar
+- Aşama: V5.5 — Local Project Persistence
 - Ortak arayüz: React + TypeScript
-- Ortak iş kuralları: platformdan bağımsız TypeScript Shared Core
+- Ortak proje modeli ve runtime guard: `packages/core`
 - Yerel geliştirme API'si: Python + FastAPI
-- Veritabanı hedefi: SQLite
+- Yerel veritabanı: SQLite
 - Medya işleme hedefi: platform adaptörü üzerinden yerel FFmpeg
 
 ## Hedef platformlar
@@ -21,6 +20,19 @@ Yerel öncelikli, modüler video üretim ve düzenleme platformu.
 - Geliştirme: yerel tarayıcı arayüzü
 
 Mobil ve PC için ayrı ürün mantıkları oluşturulmayacak. Responsive arayüz, ortak proje şeması, ortak timeline modeli ve platform adaptörleri kullanılacak. Özellik eşitliği hedeflenir; donanım ve işletim sistemi farklılıkları nedeniyle performans aynı olmak zorunda değildir.
+
+## Mevcut kod kapsamı
+- Yerel API sağlık kontrolü
+- SQLite proje kayıt tablosu
+- Proje oluşturma, listeleme, tekil proje okuma, güncelleme ve silme API uçları
+- Proje oluşturma arayüzü
+- Konu veya hazır prompt girişi
+- Hazır promptun kaynak metnini dönüştürmeden saklama
+- MP4/MOV/WebM seçimi, yön, çözünürlük ve FPS ayarları
+- Kayıtlı projeyi açma ve temel bilgilerini görüntüleme
+- Ortak TypeScript proje manifesti ve runtime doğrulayıcısı
+
+**Test durumu:** Kod GitHub'a kaydedildi. Henüz Android, iOS veya masaüstü cihazda derleme/çalıştırma ve kabul testleri tamamlanmadı. Bu nedenle bu özellikler yerel ortamda doğrulanmış sayılmaz.
 
 ## Yerel mimari
 - Shared UI: React + TypeScript
@@ -54,6 +66,7 @@ Mobil ve PC için ayrı ürün mantıkları oluşturulmayacak. Responsive arayü
 - docs/architecture/overview.md
 - docs/architecture/platform-parity.md
 - docs/development/local-first.md
+- docs/development/project-persistence.md
 - docs/roadmap/mvp.md
 - docs/security/local-security.md
 
