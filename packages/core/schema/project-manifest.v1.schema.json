@@ -1,0 +1,175 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://universal-video-engine.local/schemas/project-manifest-v1.schema.json",
+  "title": "UNIVERSAL VIDEO ENGINE Project Manifest v1",
+  "description": "Portable project manifest shared by mobile and desktop clients.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "title",
+    "createdAt",
+    "updatedAt",
+    "languages",
+    "output",
+    "assets",
+    "timeline"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "id": { "type": "string", "format": "uuid" },
+    "title": { "type": "string", "minLength": 1, "maxLength": 160 },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "languages": { "$ref": "#/$defs/languages" },
+    "prompt": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["mode", "topic"],
+          "properties": {
+            "mode": { "const": "topic" },
+            "topic": { "type": "string", "minLength": 1 },
+            "generatedPrompt": { "type": "string" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["mode", "originalText"],
+          "properties": {
+            "mode": { "const": "ready_prompt" },
+            "originalText": { "type": "string" }
+          }
+        }
+      ]
+    },
+    "output": { "$ref": "#/$defs/output" },
+    "assets": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/asset" }
+    },
+    "timeline": { "$ref": "#/$defs/timeline" }
+  },
+  "$defs": {
+    "languages": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["video", "voiceover", "subtitles", "onScreenText", "metadata"],
+      "properties": {
+        "video": { "type": "string", "minLength": 1 },
+        "voiceover": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "subtitles": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "onScreenText": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "metadata": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "orientation": {
+      "type": "string",
+      "enum": ["landscape", "portrait", "square", "custom"]
+    },
+    "output": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "format", "orientation", "width", "height", "fps"],
+          "properties": {
+            "kind": { "const": "video" },
+            "format": { "type": "string", "minLength": 1 },
+            "orientation": { "$ref": "#/$defs/orientation" },
+            "width": { "type": "integer", "minimum": 1 },
+            "height": { "type": "integer", "minimum": 1 },
+            "fps": { "type": "number", "exclusiveMinimum": 0 }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "format", "orientation", "width", "height", "fps"],
+          "properties": {
+            "kind": { "const": "animation" },
+            "format": { "type": "string", "minLength": 1 },
+            "orientation": { "$ref": "#/$defs/orientation" },
+            "width": { "type": "integer", "minimum": 1 },
+            "height": { "type": "integer", "minimum": 1 },
+            "fps": { "type": "number", "exclusiveMinimum": 0 }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "format", "orientation", "width", "height"],
+          "properties": {
+            "kind": { "const": "image" },
+            "format": { "type": "string", "minLength": 1 },
+            "orientation": { "$ref": "#/$defs/orientation" },
+            "width": { "type": "integer", "minimum": 1 },
+            "height": { "type": "integer", "minimum": 1 }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "format", "sampleRate", "channels"],
+          "properties": {
+            "kind": { "const": "audio" },
+            "format": { "type": "string", "minLength": 1 },
+            "sampleRate": { "type": "integer", "minimum": 1 },
+            "channels": { "type": "integer", "minimum": 1 }
+          }
+        }
+      ]
+    },
+    "asset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "fileName", "relativePath"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "kind": { "type": "string", "enum": ["video", "audio", "image", "text", "3d"] },
+        "fileName": { "type": "string", "minLength": 1 },
+        "relativePath": { "type": "string", "minLength": 1 },
+        "mimeType": { "type": "string" },
+        "sizeBytes": { "type": "integer", "minimum": 0 },
+        "durationMs": { "type": "number", "minimum": 0 },
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "clip": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "assetId", "startMs", "sourceInMs", "sourceOutMs"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "assetId": { "type": "string", "minLength": 1 },
+        "startMs": { "type": "number", "minimum": 0 },
+        "sourceInMs": { "type": "number", "minimum": 0 },
+        "sourceOutMs": { "type": "number", "minimum": 0 }
+      }
+    },
+    "track": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "kind", "clips"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string" },
+        "kind": { "type": "string", "enum": ["video", "audio", "text", "overlay"] },
+        "clips": { "type": "array", "items": { "$ref": "#/$defs/clip" } }
+      }
+    },
+    "timeline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["durationMs", "tracks"],
+      "properties": {
+        "durationMs": { "type": "number", "minimum": 0 },
+        "tracks": { "type": "array", "items": { "$ref": "#/$defs/track" } }
+      }
+    }
+  }
+}
