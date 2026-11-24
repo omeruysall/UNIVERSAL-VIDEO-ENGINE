@@ -99,3 +99,65 @@ export interface ProjectManifest {
   assets: ProjectAsset[];
   timeline: ProjectTimeline;
 }
+
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function isStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((item) => typeof item === "string");
+}
+
+/** Runtime guard shared by every platform before a manifest is persisted or opened. */
+export function isProjectManifest(value: unknown): value is ProjectManifest {
+  if (!isRecord(value) || value.schemaVersion !== 1) return false;
+  if (
+    typeof value.id !== "string" ||
+    typeof value.title !== "string" ||
+    typeof value.createdAt !== "string" ||
+    typeof value.updatedAt !== "string"
+  ) return false;
+
+  const languages = value.languages;
+  if (!isRecord(languages)) return false;
+  if (
+    typeof languages.video !== "string" ||
+    !isStringArray(languages.voiceover) ||
+    !isStringArray(languages.subtitles) ||
+    !isStringArray(languages.onScreenText) ||
+    !isStringArray(languages.metadata)
+  ) return false;
+
+  const output = value.output;
+  if (!isRecord(output)) return false;
+  if (
+    !["video", "audio", "image", "animation"].includes(String(output.kind)) ||
+    typeof output.format !== "string" ||
+    !["landscape", "portrait", "square", "custom"].includes(String(output.orientation)) ||
+    typeof output.width !== "number" || !Number.isFinite(output.width) || output.width <= 0 ||
+    typeof output.height !== "number" || !Number.isFinite(output.height) || output.height <= 0 ||
+    typeof output.fps !== "number" || !Number.isFinite(output.fps) || output.fps <= 0
+  ) return false;
+
+  if (!Array.isArray(value.assets)) return false;
+  const timeline = value.timeline;
+  if (!isRecord(timeline) || typeof timeline.durationMs !== "number" || !Array.isArray(timeline.tracks)) {
+    return false;
+  }
+
+  const prompt = value.prompt;
+  if (prompt !== undefined) {
+    if (!isRecord(prompt)) return false;
+    if (prompt.mode === "topic") {
+      if (typeof prompt.topic !== "string") return false;
+      if (prompt.generatedPrompt !== undefined && typeof prompt.generatedPrompt !== "string") return false;
+    } else if (prompt.mode === "ready_prompt") {
+      if (typeof prompt.originalText !== "string") return false;
+    } else {
+      return false;
+    }
+  }
+
+  return true;
+}
