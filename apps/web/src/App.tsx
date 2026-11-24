@@ -16,6 +16,8 @@ type ProjectSummary = {
 type StoredProject = ProjectSummary & { manifest: ProjectManifest };
 
 const now = () => new Date().toISOString();
+const parseLanguageList = (value: string) =>
+  value.split(",").map((language) => language.trim()).filter(Boolean);
 
 function App() {
   const [apiState, setApiState] = useState<ApiState>("checking");
@@ -32,6 +34,11 @@ function App() {
   const [width, setWidth] = useState(1920);
   const [height, setHeight] = useState(1080);
   const [fps, setFps] = useState(30);
+  const [videoLanguage, setVideoLanguage] = useState("tr");
+  const [voiceoverLanguages, setVoiceoverLanguages] = useState("tr");
+  const [subtitleLanguages, setSubtitleLanguages] = useState("en");
+  const [onScreenLanguages, setOnScreenLanguages] = useState("tr");
+  const [metadataLanguages, setMetadataLanguages] = useState("tr");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -95,11 +102,11 @@ function App() {
       createdAt: timestamp,
       updatedAt: timestamp,
       languages: {
-        video: "tr",
-        voiceover: ["tr"],
-        subtitles: ["en"],
-        onScreenText: ["tr"],
-        metadata: ["tr"],
+        video: videoLanguage.trim(),
+        voiceover: parseLanguageList(voiceoverLanguages),
+        subtitles: parseLanguageList(subtitleLanguages),
+        onScreenText: parseLanguageList(onScreenLanguages),
+        metadata: parseLanguageList(metadataLanguages),
       },
       prompt: promptMode === "topic"
         ? { mode: "topic", topic: promptText.trim() }
@@ -261,6 +268,25 @@ function App() {
               </label>
             </>}
           </div>
+          <div className="form-section-title">Dil ayarları</div>
+          <div className="language-grid">
+            <label>Ana video dili
+              <input value={videoLanguage} onChange={(event) => setVideoLanguage(event.target.value)} placeholder="tr" />
+            </label>
+            <label>Seslendirme dilleri
+              <input value={voiceoverLanguages} onChange={(event) => setVoiceoverLanguages(event.target.value)} placeholder="tr, en, de" />
+              <small>Birden fazla dil için virgülle ayır.</small>
+            </label>
+            <label>Altyazı dilleri
+              <input value={subtitleLanguages} onChange={(event) => setSubtitleLanguages(event.target.value)} placeholder="en, tr, es" />
+            </label>
+            <label>Ekran yazısı dilleri
+              <input value={onScreenLanguages} onChange={(event) => setOnScreenLanguages(event.target.value)} placeholder="tr, en" />
+            </label>
+            <label>Başlık ve açıklama dilleri
+              <input value={metadataLanguages} onChange={(event) => setMetadataLanguages(event.target.value)} placeholder="tr, en" />
+            </label>
+          </div>
           <button className="primary-button" type="submit" disabled={busy || apiState !== "online"}>{busy ? "İşleniyor..." : "Projeyi oluştur ve kaydet"}</button>
         </form>
         {message && <p className="message" role="status">{message}</p>}
@@ -292,6 +318,7 @@ function App() {
             <div><small>Prompt modu</small><strong>{selected.manifest.prompt?.mode === "ready_prompt" ? "Hazır prompt" : "Konu"}</strong></div>
             <div><small>Medya / Timeline</small><strong>{selected.manifest.assets.length} medya · {selected.manifest.timeline.tracks.length} kanal</strong></div>
           </div>
+          <div className="prompt-preview"><small>Dil yapılandırması</small><p>Ana video: {selected.manifest.languages.video} · Seslendirme: {selected.manifest.languages.voiceover.join(", ") || "Yok"} · Altyazı: {selected.manifest.languages.subtitles.join(", ") || "Yok"} · Ekran yazısı: {selected.manifest.languages.onScreenText.join(", ") || "Yok"} · Metadata: {selected.manifest.languages.metadata.join(", ") || "Yok"}</p></div>
           {selected.manifest.prompt && <div className="prompt-preview"><small>Kaydedilen girdi</small><p>{selected.manifest.prompt.mode === "ready_prompt" ? selected.manifest.prompt.originalText : selected.manifest.prompt.topic}</p></div>}
         </section>
       )}
