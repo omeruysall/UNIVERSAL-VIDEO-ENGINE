@@ -14,7 +14,8 @@
 ## MVP-1 — Shared Core & Project
 - [x] Platformdan bağımsız TypeScript proje manifesti
 - [x] Manifest için ilk runtime doğrulayıcı
-- [ ] JSON Schema ve manifest migration sistemi
+- [x] Project Manifest v1 JSON Schema
+- [ ] Manifest migration sistemi
 - [x] Proje oluşturma/listeleme/açma API ve arayüzü (kodlandı; cihaz testi bekliyor)
 - [x] Konu ve hazır prompt modları
 - [x] Hazır prompt metnini dönüştürmeden saklama
