@@ -61,7 +61,7 @@ def initialize_database() -> None:
         if 1 not in applied:
             connection.execute(
                 """
-                CREATE TABLE projects (
+                CREATE TABLE IF NOT EXISTS projects (
                     id TEXT PRIMARY KEY,
                     title TEXT NOT NULL,
                     manifest_json TEXT NOT NULL,
@@ -71,7 +71,7 @@ def initialize_database() -> None:
                 """
             )
             connection.execute(
-                "CREATE INDEX idx_projects_updated_at ON projects(updated_at DESC)"
+                "CREATE INDEX IF NOT EXISTS idx_projects_updated_at ON projects(updated_at DESC)"
             )
             connection.execute(
                 "INSERT INTO schema_migrations (version, name, applied_at) VALUES (?, ?, ?)",
