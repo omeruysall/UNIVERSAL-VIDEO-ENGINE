@@ -45,18 +45,38 @@ def initialize_database() -> None:
     with db_session() as connection:
         connection.execute(
             """
-            CREATE TABLE IF NOT EXISTS projects (
-                id TEXT PRIMARY KEY,
-                title TEXT NOT NULL,
-                manifest_json TEXT NOT NULL,
-                created_at TEXT NOT NULL,
-                updated_at TEXT NOT NULL
+            CREATE TABLE IF NOT EXISTS schema_migrations (
+                version INTEGER PRIMARY KEY,
+                name TEXT NOT NULL,
+                applied_at TEXT NOT NULL
             )
             """
         )
-        connection.execute(
-            "CREATE INDEX IF NOT EXISTS idx_projects_updated_at ON projects(updated_at DESC)"
-        )
+        applied = {
+            row["version"]
+            for row in connection.execute("SELECT version FROM schema_migrations").fetchall()
+        }
+
+        # Migration 1: initial local project persistence.
+        if 1 not in applied:
+            connection.execute(
+                """
+                CREATE TABLE projects (
+                    id TEXT PRIMARY KEY,
+                    title TEXT NOT NULL,
+                    manifest_json TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    updated_at TEXT NOT NULL
+                )
+                """
+            )
+            connection.execute(
+                "CREATE INDEX idx_projects_updated_at ON projects(updated_at DESC)"
+            )
+            connection.execute(
+                "INSERT INTO schema_migrations (version, name, applied_at) VALUES (?, ?, ?)",
+                (1, "initial_project_storage", utc_now()),
+            )
 
 
 class ProjectWrite(BaseModel):
@@ -150,11 +170,16 @@ def health() -> dict:
     initialize_database()
     with db_session() as connection:
         connection.execute("SELECT 1")
+    with db_session() as connection:
+        migration = connection.execute(
+            "SELECT MAX(version) AS version FROM schema_migrations"
+        ).fetchone()
     return {
         "status": "ok",
         "application": "universal-video-engine",
         "mode": "local",
         "database": "sqlite",
+        "database_schema_version": migration["version"] or 0,
         "version": APP_VERSION,
     }
 
