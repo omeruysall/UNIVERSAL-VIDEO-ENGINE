@@ -29,6 +29,7 @@ Mobil ve PC için ayrı ürün mantıkları oluşturulmayacak. Responsive arayü
 - Konu veya hazır prompt girişi
 - Hazır promptun kaynak metnini dönüştürmeden saklama
 - Video, ses, görsel ve animasyon çıktı türleri için formata uygun ayarlar
+- Ana video, seslendirme, altyazı, ekran yazısı ve metadata için bağımsız çoklu dil ayarları
 - Kayıtlı projeyi açma ve temel bilgilerini görüntüleme
 - Ortak TypeScript proje manifesti ve runtime doğrulayıcısı
 
