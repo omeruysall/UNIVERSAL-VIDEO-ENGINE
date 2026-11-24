@@ -6,7 +6,8 @@
 - [x] FastAPI yerel API iskeleti
 - [x] Mobil + PC özellik eşitliği mimari kararı
 - [x] SQLite ile ilk proje kayıt tablosu ve CRUD altyapısı (kodlandı; cihaz testi bekliyor)
-- [ ] SQLite migration/version yönetimi
+- [x] SQLite migration/version yönetimi (migration 1)
+- [x] Yerel API için otomatik CRUD/validasyon testlerinin yazılması (çalıştırma bekliyor)
 - [ ] Yerel sağlık kontrolünün cihazda doğrulanması
 - [ ] Android/Termux geliştirme ortamı doğrulaması
 - [ ] Masaüstü geliştirme ortamında kurulum doğrulaması
