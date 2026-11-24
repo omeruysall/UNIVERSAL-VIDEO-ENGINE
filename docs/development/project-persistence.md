@@ -16,7 +16,7 @@ Varsayılan: repository root içindeki `data/app.sqlite3`.
 - `PUT /api/v1/projects/{id}`: proje manifestini güncelle
 - `DELETE /api/v1/projects/{id}`: proje kaydını sil
 
-Yazma uçları manifestin şema sürümünü, kimliğini ve zorunlu üst düzey alanlarını kontrol eder. Shared Core tarafında `isProjectManifest` runtime guard bulunur.
+Yazma uçları manifestin şema sürümünü, kimliğini ve zorunlu üst düzey alanlarını kontrol eder. Shared Core tarafında `isProjectManifest` runtime guard bulunur. Taşınabilir manifest sözleşmesinin JSON Schema karşılığı `packages/core/schema/project-manifest.v1.schema.json` dosyasındadır.
 
 ## Bağımsız çoklu dil alanları
 Proje manifesti; ana video dili, seslendirme dilleri, altyazı dilleri, ekrandaki metin dilleri ve başlık/açıklama (metadata) dillerini ayrı saklar. Arayüzde birden fazla dil virgülle ayrılarak girilebilir; alanlar birbirinden bağımsızdır. Bu aşamada dil seçimi ve kaydı vardır; çeviri, dublaj, ses üretimi ve altyazı üretim motorları henüz eklenmemiştir.
