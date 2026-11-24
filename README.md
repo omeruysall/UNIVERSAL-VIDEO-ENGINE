@@ -2,27 +2,36 @@
 
 Yerel öncelikli, modüler video üretim ve düzenleme platformu.
 
+**Ürün hedefi:** Android, iOS, Windows, macOS ve Linux üzerinde aynı temel özellikleri sunan; ortak proje formatı ve ortak üretim çekirdeği kullanan mobil + masaüstü uygulaması.
+
 **Geliştirme ilkesi:** Temel işlevler kullanıcının kendi cihazında çalışır. Zorunlu bulut sunucusu, bulut veritabanı veya bulut medya depolama yoktur. GitHub yalnızca kaynak kodu, dokümantasyon ve sürüm yönetimi içindir.
 
 ## Proje durumu
-- Aşama: V5.3 — Repository Initialization & Project Foundation
-- Hedef cihaz: Android 16 / Samsung Galaxy A53 5G
-- İlk ortam: Termux + Python + Node.js + FFmpeg
-- Arayüz: React + TypeScript
-- Yerel API: Python + FastAPI
-- Veritabanı: SQLite
-- Medya işleme: Yerel FFmpeg
+- Aşama: V5.4 — Cross-Platform Feature Parity Architecture
+- İlk geliştirme ortamı: Android/Termux veya masaüstü bilgisayar
+- Ortak arayüz: React + TypeScript
+- Ortak iş kuralları: platformdan bağımsız TypeScript Shared Core
+- Yerel geliştirme API'si: Python + FastAPI
+- Veritabanı hedefi: SQLite
+- Medya işleme hedefi: platform adaptörü üzerinden yerel FFmpeg
+
+## Hedef platformlar
+- Mobil: Android ve iOS
+- Masaüstü: Windows, macOS ve Linux
+- Geliştirme: yerel tarayıcı arayüzü
+
+Mobil ve PC için ayrı ürün mantıkları oluşturulmayacak. Responsive arayüz, ortak proje şeması, ortak timeline modeli ve platform adaptörleri kullanılacak. Özellik eşitliği hedeflenir; donanım ve işletim sistemi farklılıkları nedeniyle performans aynı olmak zorunda değildir.
 
 ## Yerel mimari
-Android cihaz
-- Termux: FastAPI, worker, FFmpeg ve yerel medya deposu
-- Tarayıcı: localhost üzerinde React arayüzü
-- SQLite: proje ve işlem metaverileri
-
-Servisler varsayılan olarak yalnızca 127.0.0.1 üzerinde dinler. Harici erişim varsayılan olarak kapalıdır.
+- Shared UI: React + TypeScript
+- Shared Core: proje, prompt, timeline, dil, çıktı ve iş akışı kuralları
+- Mobil kabuk: Capacitor PoC (teknik doğrulama gerekli)
+- Masaüstü kabuk: Tauri PoC (teknik doğrulama gerekli)
+- Platform adaptörleri: dosya sistemi, SQLite, medya seçici, arka plan işi ve render
+- FastAPI: ilk geliştirme/yerel worker bileşeni; mobil uygulama Termux veya harici Python kurulumuna bağımlı olmayacak
 
 ## İlk MVP
-1. Yerel uygulama iskeleti ve sağlık kontrolü
+1. Ortak proje şeması ve yerel uygulama iskeleti
 2. Proje oluşturma, listeleme, kaydetme ve yeniden açma
 3. Konu veya hazır prompt girişi (hazır prompt birebir korunur)
 4. Video çıktı ayarları
@@ -30,6 +39,7 @@ Servisler varsayılan olarak yalnızca 127.0.0.1 üzerinde dinler. Harici erişi
 6. Basit çok kanallı timeline
 7. FFmpeg ile yerel MP4 dışa aktarma
 8. İşlem durumu ve temel kalite kontrolü
+9. Aynı proje dosyasını mobil ve PC arasında aktararak açma testi
 
 ## Geliştirme ilkeleri
 - Önce yerel ve çevrimdışı temel işlevler.
@@ -38,9 +48,11 @@ Servisler varsayılan olarak yalnızca 127.0.0.1 üzerinde dinler. Harici erişi
 - API anahtarları, kişisel medya ve veritabanı GitHub'a gönderilmez.
 - Ağ erişimi gerektiren özellikler açıkça belirtilir ve varsayılan olarak kapalıdır.
 - Büyük AI modelleri ve ağır 3D/render işlemleri cihaz kapasitesine göre sınırlandırılır.
+- Her ortak özellik mobil ve masaüstünde aynı kabul senaryolarıyla test edilir.
 
 ## Dokümantasyon
 - docs/architecture/overview.md
+- docs/architecture/platform-parity.md
 - docs/development/local-first.md
 - docs/roadmap/mvp.md
 - docs/security/local-security.md
