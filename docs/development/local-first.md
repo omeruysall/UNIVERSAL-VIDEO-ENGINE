@@ -1,25 +1,46 @@
-# Yerel Geliştirme Ortamı
+# Yerel Öncelikli ve Hibrit Geliştirme Modeli
 
-## Hedef
-Birincil geliştirme cihazı Android 16 çalışan Samsung Galaxy A53 5G'dir. Geliştirme bilgisayar olmadan, Termux ve mobil kod editörüyle yürütülecek.
+## Ürün çalışma modeli
 
-## Planlanan araçlar
-- Termux: terminal, Git, Python, Node.js ve FFmpeg
-- Acode veya benzeri editör: kaynak kodu düzenleme
-- GitHub: kod deposu, issue ve sürüm takibi
-- Chrome: localhost arayüz testi
+UNIVERSAL VIDEO ENGINE hibrit çalışır; ancak yerel işlevler temel alınır.
 
-## Yerel servis adresleri
-- UI geliştirme sunucusu: http://127.0.0.1:5173
-- API: http://127.0.0.1:8000
-- API şeması: http://127.0.0.1:8000/docs
+**Yerel çalışması hedeflenen işlevler:**
+- Proje oluşturma, açma, kaydetme, sürümleme ve yedekleme.
+- Medya içe aktarma, asset kataloglama ve dosya yönetimi.
+- Timeline, kesme, birleştirme, temel efektler ve önizleme.
+- Desteklenen cihazlarda video/ses render ve dışa aktarma.
+- MIDI, kayıt, ses düzenleme, miksaj ve yerel enstrümanlar.
+- Görsel, animasyon ve 3D düzenlemenin cihazın desteklediği bölümü.
 
-Bu adresler hedef yapılandırmadır; henüz çalışan servis oldukları anlamına gelmez.
+**İsteğe bağlı çevrimiçi işlevler:**
+- Harici AI metin, görsel, video, müzik ve ses üretim servisleri.
+- Ağ tabanlı model indirme/güncelleme.
+- Kullanıcının ayrıca etkinleştirdiği senkronizasyon, paylaşım veya yayın servisleri.
 
-## Kurulum yaklaşımı
-Kurulum adım adım yapılacaktır. Önce Termux kaynağı doğrulanır, ardından Git/Python/Node.js/FFmpeg sürümleri kontrol edilir. Android ARM64 uyumluluğu doğrulanmadan paket veya sürüm zorlanmaz.
+Uygulamanın temel proje açma ve düzenleme akışları zorunlu bir bulut hesabına bağlı olmayacaktır.
+
+## Harici sağlayıcı onayı
+
+Harici AI veya bulut görevi başlamadan önce:
+- Sağlayıcı ve kullanılacak model belirtilir.
+- Hangi metin, görsel, ses, video veya proje verisinin gönderileceği açıklanır.
+- İnternet gereksinimi ve sağlayıcı tarafından bildirilen ücret/kota bilgisi gösterilir.
+- Bilinen veri saklama ve kullanım koşullarına bağlantı verilir.
+- Kullanıcı ilgili görev için açık onay verir.
+
+API anahtarları güvenli platform depolamasında tutulur; GitHub'a veya düz metin proje dosyasına yazılmaz. Kullanıcı onaylamazsa görev gönderilmez.
+
+## Geliştirme ortamı
+
+Geliştirme için GitHub Codespaces veya yerel masaüstü ortamı kullanılabilir. Codespaces geliştirme/test ortamıdır; nihai uygulamanın bulutta çalışacağı anlamına gelmez. Android'de Termux zorunlu geliştirme veya çalışma bağımlılığı olmayacaktır.
+
+Mevcut web arayüzü ve FastAPI geliştirme servisi, geliştirme aşamasında kullanılabilir. Nihai mobil uygulama gerekli yerel işlevleri native/platform adaptörleri veya uygulamaya paketlenmiş motorlarla sağlamalıdır.
 
 ## Yerel veri dizini
+
+Örnek proje depolama yapısı:
+
+```text
 data/
   app.sqlite3
   projects/
@@ -27,9 +48,25 @@ data/
       project.json
       media/
       proxies/
-      timeline/
+      thumbnails/
+      timelines/
+      music/
+      images/
+      animation/
+      scenes-3d/
       renders/
       exports/
       backups/
+  cache/
+  logs/
+```
 
-Bu klasör Git'e eklenmez.
+Bu dizin ve kullanıcı medyası Git'e eklenmez. Uygulama her platformda güvenli uygulama depolama alanını ve kullanıcı tarafından seçilen dışa aktarma konumlarını kullanır.
+
+## Yerel servis güvenliği
+
+- Geliştirme API'si varsayılan olarak loopback üzerinde çalışır.
+- Codespaces portları özel erişimle sınırlandırılır; herkese açık port açılmaz.
+- Üretim mobil paketinde harici Python servisi zorunlu değildir.
+- Dosya ve render işleri doğrulanmış asset kimlikleriyle yürütülür.
+- Kullanıcı verisi ve sağlayıcı sırları loglara veya Git'e yazılmaz.
