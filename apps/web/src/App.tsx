@@ -3,7 +3,7 @@ import type { FormEvent } from "react";
 import { createMusicStudioDocument, isMusicStudioData, isProjectManifest, isProjectManifestV2, migrateProjectV1ToV2 } from "@uve/core";
 import type { OutputKind, OutputSettings, ProjectManifest, ProjectManifestV2, StudioType, VideoOrientation } from "@uve/core";
 
-const API = "http://127.0.0.1:8000/api/v1";
+const API = "/api/v1";
 
 type ApiState = "checking" | "online" | "offline";
 type PromptMode = "topic" | "ready_prompt";
