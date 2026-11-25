@@ -154,10 +154,12 @@ Platform-specific audio engines are hidden behind adapters. The same project sho
 
 ### Music-0 — Specification
 - [x] Product scope and architecture principles documented
-- [ ] Music project manifest design
+- [x] Initial versioned music session data contract
+- [ ] Full JSON Schema and backend validation parity
 - [ ] Audio-engine and platform capability spike
 
 ### Music-1 — Local foundation
+- [x] Initial music document factory and default session structure
 - [ ] Music project create/open/save
 - [ ] Audio asset import and metadata
 - [ ] Basic playback engine and transport
