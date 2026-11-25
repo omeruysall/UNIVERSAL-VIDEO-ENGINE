@@ -60,7 +60,7 @@ export function isStudioDocument(value: unknown): value is StudioDocument {
   if (
     value.assetIds !== undefined &&
     (!Array.isArray(value.assetIds) ||
-      !value.assetIds.every((assetId) => typeof assetId === "string" && assetId.length > 0))
+      !value.assetIds.every((assetId) => typeof assetId === "string" && assetId.trim().length > 0))
   ) return false;
 
   return true;
