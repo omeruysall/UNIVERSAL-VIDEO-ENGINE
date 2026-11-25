@@ -71,3 +71,14 @@ footer{display:flex;justify-content:space-between;gap:16px;margin-top:28px;paddi
 .upgrade-panel{padding:15px;border:1px solid #695a36;border-radius:10px;background:#211d14}
 .upgrade-panel p{margin:0 0 13px;color:#d8c99e;font-size:12px;line-height:1.6}
 @media(max-width:680px){.studio-grid{grid-template-columns:1fr}.studio-card{align-items:flex-start;flex-direction:column}.studio-state{align-self:flex-start}}
+
+.music-studio-card{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start}
+.music-settings-form{grid-column:1/-1;margin-top:10px;padding-top:16px;border-top:1px solid #2c394c;display:grid;gap:14px}
+.music-form-heading{display:grid;gap:5px}
+.music-form-heading strong{font-size:13px;color:#e2eaf7}
+.music-form-heading span{font-size:11px;color:#8997ac}
+.music-settings-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.music-settings-grid label{display:grid;gap:7px;color:#cbd4e2;font-size:11px;font-weight:650}
+.music-session-summary{display:flex;gap:8px;flex-wrap:wrap}
+.music-session-summary span{padding:6px 9px;border:1px solid #34445d;border-radius:7px;color:#aabbd3;font-size:10px}
+@media(max-width:680px){.music-studio-card{grid-template-columns:1fr}.music-settings-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
