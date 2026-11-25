@@ -99,3 +99,72 @@ def test_rejects_duplicate_project_id(client):
     payload = project_payload()
     assert client.post("/api/v1/projects", json=payload).status_code == 201
     assert client.post("/api/v1/projects", json=payload).status_code == 409
+
+
+
+def test_v2_project_create_read_preserves_studio_documents(client):
+    payload = project_payload()
+    payload["manifest"]["schemaVersion"] = 2
+    payload["manifest"]["studios"] = [
+        {
+            "id": "music-main",
+            "studioType": "music",
+            "documentVersion": 1,
+            "title": "Music Draft",
+            "createdAt": "2026-11-24T12:00:00+00:00",
+            "updatedAt": "2026-11-24T12:00:00+00:00",
+            "assetIds": [],
+            "data": {"bpm": 92, "genre": "melodic-rap"},
+        }
+    ]
+
+    created = client.post("/api/v1/projects", json=payload)
+    assert created.status_code == 201
+    assert created.json()["manifest"] == payload["manifest"]
+
+    opened = client.get(f"/api/v1/projects/{payload['id']}")
+    assert opened.status_code == 200
+    assert opened.json()["manifest"] == payload["manifest"]
+    assert opened.json()["manifest"]["studios"][0]["data"]["bpm"] == 92
+
+
+def test_v2_rejects_duplicate_studio_document_ids(client):
+    payload = project_payload()
+    payload["manifest"]["schemaVersion"] = 2
+    studio = {
+        "id": "duplicate",
+        "studioType": "video",
+        "documentVersion": 1,
+        "title": "Video Draft",
+        "createdAt": "2026-11-24T12:00:00+00:00",
+        "updatedAt": "2026-11-24T12:00:00+00:00",
+        "data": {},
+    }
+    payload["manifest"]["studios"] = [studio, dict(studio)]
+    response = client.post("/api/v1/projects", json=payload)
+    assert response.status_code == 422
+
+
+def test_v2_rejects_invalid_studio_document(client):
+    payload = project_payload()
+    payload["manifest"]["schemaVersion"] = 2
+    payload["manifest"]["studios"] = [{
+        "id": "bad-studio",
+        "studioType": "unknown",
+        "documentVersion": 0,
+        "title": "Broken",
+        "createdAt": "2026-11-24T12:00:00+00:00",
+        "updatedAt": "2026-11-24T12:00:00+00:00",
+        "data": {},
+    }]
+    response = client.post("/api/v1/projects", json=payload)
+    assert response.status_code == 422
+
+
+def test_v1_project_storage_remains_backward_compatible(client):
+    payload = project_payload()
+    created = client.post("/api/v1/projects", json=payload)
+    assert created.status_code == 201
+    opened = client.get(f"/api/v1/projects/{payload['id']}")
+    assert opened.status_code == 200
+    assert opened.json()["manifest"] == payload["manifest"]
