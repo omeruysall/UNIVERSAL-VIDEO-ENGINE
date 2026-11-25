@@ -91,8 +91,42 @@ def validate_project(payload: ProjectWrite) -> str:
     except ValueError as exc:
         raise HTTPException(status_code=422, detail="Project id must be a valid UUID") from exc
 
-    if payload.manifest.get("schemaVersion") != 1:
+    schema_version = payload.manifest.get("schemaVersion")
+    if schema_version not in (1, 2):
         raise HTTPException(status_code=422, detail="Unsupported project schemaVersion")
+    if schema_version == 2:
+        studios = payload.manifest.get("studios")
+        if not isinstance(studios, list):
+            raise HTTPException(status_code=422, detail="studios must be an array")
+        studio_ids = set()
+        allowed_studio_types = {"video", "music", "audio", "image", "animation", "3d"}
+        for studio in studios:
+            if not isinstance(studio, dict):
+                raise HTTPException(status_code=422, detail="Each studio document must be an object")
+            required_studio_fields = ("id", "studioType", "documentVersion", "title", "createdAt", "updatedAt", "data")
+            if any(field not in studio for field in required_studio_fields):
+                raise HTTPException(status_code=422, detail="Studio document is missing required fields")
+            if not isinstance(studio["id"], str) or not studio["id"].strip():
+                raise HTTPException(status_code=422, detail="Studio document id must be a non-empty string")
+            if studio["id"] in studio_ids:
+                raise HTTPException(status_code=422, detail="Studio document ids must be unique")
+            studio_ids.add(studio["id"])
+            if studio["studioType"] not in allowed_studio_types:
+                raise HTTPException(status_code=422, detail="Unsupported studioType")
+            if not isinstance(studio["documentVersion"], int) or isinstance(studio["documentVersion"], bool) or studio["documentVersion"] < 1:
+                raise HTTPException(status_code=422, detail="documentVersion must be a positive integer")
+            if not isinstance(studio["title"], str) or not studio["title"].strip():
+                raise HTTPException(status_code=422, detail="Studio document title must be a non-empty string")
+            if not isinstance(studio["createdAt"], str) or not isinstance(studio["updatedAt"], str):
+                raise HTTPException(status_code=422, detail="Studio document timestamps must be strings")
+            if not isinstance(studio["data"], dict):
+                raise HTTPException(status_code=422, detail="Studio document data must be an object")
+            asset_ids = studio.get("assetIds")
+            if asset_ids is not None and (
+                not isinstance(asset_ids, list)
+                or not all(isinstance(asset_id, str) and asset_id for asset_id in asset_ids)
+            ):
+                raise HTTPException(status_code=422, detail="assetIds must be an array of non-empty strings")
     if payload.manifest.get("id") != project_id:
         raise HTTPException(status_code=422, detail="Manifest id must match project id")
     if payload.manifest.get("title") != payload.title:
