@@ -79,7 +79,7 @@ test("v1 migration preserves all existing project data without mutating input", 
   assert.equal(migrated.schemaVersion, 2);
   assert.deepEqual(migrated.studios, []);
   const { studios: _studios, ...migratedProjectFields } = migrated;
-  assert.deepEqual(migratedProjectFields, source);
+  assert.deepEqual({ ...migratedProjectFields, schemaVersion: 1 }, source);
   assert.deepEqual(source, before);
   assert.equal(migrated.prompt?.mode === "ready_prompt" ? migrated.prompt.originalText : "", "  preserve this prompt exactly  ");
 });
