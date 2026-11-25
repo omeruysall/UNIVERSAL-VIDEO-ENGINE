@@ -1,3 +1,4 @@
+import { isProjectManifest } from "./project";
 import type { ProjectManifest } from "./project";
 
 export const STUDIO_TYPES = [
@@ -68,7 +69,6 @@ export function isProjectManifestV2(value: unknown): value is ProjectManifestV2 
 
   const legacyShape = { ...value, schemaVersion: 1 };
   // The v1 guard validates all shared project fields; v2 adds only the studio registry.
-  const { isProjectManifest } = requireProjectValidator();
   if (!isProjectManifest(legacyShape)) return false;
 
   const studios = value.studios;
@@ -83,7 +83,6 @@ export function isProjectManifestV2(value: unknown): value is ProjectManifestV2 
  * The input is never mutated and all v1 project fields are retained unchanged.
  */
 export function migrateProjectV1ToV2(value: unknown): ProjectManifestV2 | null {
-  const { isProjectManifest } = requireProjectValidator();
   if (!isProjectManifest(value)) return null;
 
   const migrated: ProjectManifestV2 = {
@@ -95,9 +94,3 @@ export function migrateProjectV1ToV2(value: unknown): ProjectManifestV2 | null {
   return migrated;
 }
 
-// Kept as a static import boundary to avoid a project.ts -> studio.ts cycle.
-function requireProjectValidator(): typeof import("./project") {
-  return projectValidator;
-}
-
-import * as projectValidator from "./project";
