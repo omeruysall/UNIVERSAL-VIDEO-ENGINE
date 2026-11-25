@@ -46,7 +46,7 @@ export interface MusicTrack {
   pan: number;
 }
 
-export interface MusicStudioData {
+export interface MusicStudioData extends Record<string, unknown> {
   metadata: {
     artist: string;
     album: string;
@@ -97,7 +97,12 @@ export function isMusicStudioData(value: unknown): value is MusicStudioData {
   const musical = value.musical;
   const arrangement = value.arrangement;
   const audio = value.audio;
-  if (![metadata, musical, arrangement, audio].every(isRecord)) return false;
+  if (
+    !isRecord(metadata) ||
+    !isRecord(musical) ||
+    !isRecord(arrangement) ||
+    !isRecord(audio)
+  ) return false;
 
   if (
     typeof metadata.artist !== "string" ||
