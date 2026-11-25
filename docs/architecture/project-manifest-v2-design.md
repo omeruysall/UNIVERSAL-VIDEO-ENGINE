@@ -2,7 +2,7 @@
 
 ## Durum
 
-Tasarım aşamasında. Bu belge henüz çalışan v2 desteği anlamına gelmez. Mevcut v1 manifestleri ve kayıtlı kullanıcı projeleri korunacaktır.
+Kademeli uygulama aşamasında. TypeScript v2 sözleşmesi, v1'den bellekte migration, v2 JSON Schema ve backend'in v1/v2 saklama desteği eklendi. Core migration/veri bütünlüğü testleri CI'ya bağlandı; son CI doğrulaması bekleniyor. UI'nin v2 üretmesi ve gerçek medya dosyası yönetimi henüz tamamlanmadı. Mevcut v1 manifestleri korunur.
 
 ## Mevcut durumun tespiti
 
@@ -58,13 +58,13 @@ Proje manifesti, stüdyo belgelerini bir dizi veya kimlikli kayıt olarak tutar.
 
 ## Uygulama sırası
 
-1. v2 TypeScript tipleri ve ortak studio document registry.
-2. v1/v2 runtime doğrulayıcıları ve saf migration fonksiyonu.
-3. v2 JSON Schema ve fixture örnekleri.
-4. Migration ve veri bütünlüğü testleri.
-5. Backend'in v1/v2 kabulü ve saklama davranışı.
-6. UI'nin yeni projelerde v2 üretmesi ve eski projeleri güvenli açması.
-7. CI'da tüm kontrollerin zorunlu hale getirilmesi.
+1. [Tamamlandı] v2 TypeScript tipleri ve ortak studio document registry.
+2. [Tamamlandı] v1/v2 runtime doğrulayıcıları ve saf migration fonksiyonu.
+3. [Tamamlandı] v2 JSON Schema.
+4. [CI doğrulaması bekleniyor] Migration ve veri bütünlüğü testleri.
+5. [Tamamlandı] Backend'in v1/v2 kabulü ve saklama davranışı.
+6. [Sıradaki] UI'nin yeni projelerde v2 üretmesi ve eski projeleri güvenli açması.
+7. [Kısmen tamamlandı] CI'da backend, core test ve frontend build kontrollerinin zorunlu hale getirilmesi.
 
 ## Kapsam dışı
 
