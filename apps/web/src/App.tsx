@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import type { FormEvent } from "react";
-import { createMusicStudioDocument, isProjectManifest, isProjectManifestV2, migrateProjectV1ToV2 } from "@uve/core";
+import { createMusicStudioDocument, isMusicStudioData, isProjectManifest, isProjectManifestV2, migrateProjectV1ToV2 } from "@uve/core";
 import type { OutputKind, OutputSettings, ProjectManifest, ProjectManifestV2, StudioType, VideoOrientation } from "@uve/core";
 
 const API = "http://127.0.0.1:8000/api/v1";
@@ -228,6 +228,48 @@ function App() {
     });
   }
 
+  async function saveMusicSettings(event: FormEvent<HTMLFormElement>, studioId: string) {
+    event.preventDefault();
+    if (!selected || selected.manifest.schemaVersion !== 2) return;
+    const formData = new FormData(event.currentTarget);
+    const current = selected.manifest.studios.find((studio) => studio.id === studioId);
+    if (!current || current.studioType !== "music" || !isMusicStudioData(current.data)) {
+      setMessage("Müzik stüdyosu verisi doğrulanamadı.");
+      return;
+    }
+    const nextData = {
+      ...current.data,
+      metadata: { ...current.data.metadata, genre: String(formData.get("genre") ?? "") },
+      musical: {
+        ...current.data.musical,
+        bpm: Number(formData.get("bpm")),
+        key: String(formData.get("key") ?? ""),
+        mode: String(formData.get("mode") ?? "") as typeof current.data.musical.mode,
+        timeSignature: {
+          numerator: Number(formData.get("numerator")),
+          denominator: Number(formData.get("denominator")) as 2 | 4 | 8 | 16,
+        },
+      },
+      audio: {
+        ...current.data.audio,
+        sampleRate: Number(formData.get("sampleRate")) as typeof current.data.audio.sampleRate,
+        bitDepth: Number(formData.get("bitDepth")) as typeof current.data.audio.bitDepth,
+        loudnessTargetLufs: Number(formData.get("loudness")),
+        truePeakLimitDbtp: Number(formData.get("truePeak")),
+      },
+    };
+    if (!isMusicStudioData(nextData)) {
+      setMessage("Müzik ayarları geçersiz. BPM, ölçü ve ses hedeflerini kontrol et.");
+      return;
+    }
+    await saveManifest({
+      ...selected.manifest,
+      studios: selected.manifest.studios.map((studio) =>
+        studio.id === studioId ? { ...studio, updatedAt: now(), data: nextData } : studio
+      ),
+    });
+  }
+
   async function deleteProject(id: string) {
     if (!window.confirm("Bu projeyi yerel veritabanından silmek istiyor musun?")) return;
     setBusy(true);
@@ -405,9 +447,32 @@ function App() {
               <>
                 <div className="studio-grid">
                   {selected.manifest.studios.length === 0 ? <p className="empty-state">Bu projede henüz stüdyo belgesi yok. Aşağıdan bir stüdyo oluştur.</p> : selected.manifest.studios.map((studio) => (
-                    <article className="studio-card" key={studio.id}>
+                    <article className={studio.studioType === "music" ? "studio-card music-studio-card" : "studio-card"} key={studio.id}>
                       <div><small>{STUDIO_LABELS[studio.studioType]}</small><strong>{studio.title}</strong><span>{Object.keys(studio.data).length} veri alanı · Sürüm {studio.documentVersion}</span></div>
                       <span className="studio-state">BELGE OLUŞTURULDU</span>
+                      {studio.studioType === "music" && isMusicStudioData(studio.data) && (
+                        <form className="music-settings-form" onSubmit={(event) => void saveMusicSettings(event, studio.id)}>
+                          <div className="music-form-heading"><strong>Music Studio · Session Setup</strong><span>Temel müzik oturumu ayarları</span></div>
+                          <div className="music-settings-grid">
+                            <label>BPM<input name="bpm" type="number" min="20" max="300" step="0.1" defaultValue={studio.data.musical.bpm} /></label>
+                            <label>Ton<select name="key" defaultValue={studio.data.musical.key}>{["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"].map((key) => <option key={key} value={key}>{key}</option>)}</select></label>
+                            <label>Gam / Mod<select name="mode" defaultValue={studio.data.musical.mode}><option value="major">Majör</option><option value="minor">Minör</option><option value="dorian">Dorian</option><option value="phrygian">Phrygian</option><option value="lydian">Lydian</option><option value="mixolydian">Mixolydian</option><option value="locrian">Locrian</option><option value="harmonic_minor">Harmonic Minor</option><option value="melodic_minor">Melodic Minor</option></select></label>
+                            <label>Ölçü payı<select name="numerator" defaultValue={studio.data.musical.timeSignature.numerator}>{[2,3,4,5,6,7,8,9,12].map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
+                            <label>Ölçü birimi<select name="denominator" defaultValue={studio.data.musical.timeSignature.denominator}>{[2,4,8,16].map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
+                            <label>Müzik türü<input name="genre" defaultValue={studio.data.metadata.genre} maxLength={80} /></label>
+                            <label>Örnekleme hızı<select name="sampleRate" defaultValue={studio.data.audio.sampleRate}>{[44100,48000,88200,96000,192000].map((value) => <option key={value} value={value}>{(value/1000).toFixed(value%1000===0?0:1)} kHz</option>)}</select></label>
+                            <label>Bit derinliği<select name="bitDepth" defaultValue={studio.data.audio.bitDepth}>{[16,24,32].map((value) => <option key={value} value={value}>{value}-bit</option>)}</select></label>
+                            <label>Hedef loudness (LUFS)<input name="loudness" type="number" min="-36" max="0" step="0.1" defaultValue={studio.data.audio.loudnessTargetLufs} /></label>
+                            <label>True Peak sınırı (dBTP)<input name="truePeak" type="number" min="-12" max="0" step="0.1" defaultValue={studio.data.audio.truePeakLimitDbtp} /></label>
+                          </div>
+                          <div className="music-session-summary">
+                            <span>{studio.data.arrangement.sections.length} şarkı bölümü</span>
+                            <span>{studio.data.arrangement.tracks.length} başlangıç kanalı</span>
+                            <span>{studio.data.musical.tempoMap.length} tempo noktası</span>
+                          </div>
+                          <button type="submit" className="primary-button" disabled={busy}>Müzik ayarlarını kaydet</button>
+                        </form>
+                      )}
                     </article>
                   ))}
                 </div>
