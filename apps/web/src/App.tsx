@@ -270,6 +270,38 @@ function App() {
     });
   }
 
+  async function saveMusicArrangement(event: FormEvent<HTMLFormElement>, studioId: string) {
+    event.preventDefault();
+    if (!selected || selected.manifest.schemaVersion !== 2) return;
+    const current = selected.manifest.studios.find((studio) => studio.id === studioId);
+    if (!current || current.studioType !== "music" || !isMusicStudioData(current.data)) {
+      setMessage("Müzik düzenlemesi doğrulanamadı.");
+      return;
+    }
+    const formData = new FormData(event.currentTarget);
+    const sections = current.data.arrangement.sections.map((section) => ({
+      ...section,
+      label: String(formData.get(`label:${section.id}`) ?? section.label).trim(),
+      startBar: Number(formData.get(`startBar:${section.id}`)),
+      bars: Number(formData.get(`bars:${section.id}`)),
+      lyrics: String(formData.get(`lyrics:${section.id}`) ?? ""),
+    }));
+    const nextData = {
+      ...current.data,
+      arrangement: { ...current.data.arrangement, sections },
+    };
+    if (!isMusicStudioData(nextData)) {
+      setMessage("Şarkı düzeni geçersiz. Bölüm adlarını ve ölçü aralıklarını kontrol et.");
+      return;
+    }
+    await saveManifest({
+      ...selected.manifest,
+      studios: selected.manifest.studios.map((studio) =>
+        studio.id === studioId ? { ...studio, updatedAt: now(), data: nextData } : studio
+      ),
+    });
+  }
+
   async function deleteProject(id: string) {
     if (!window.confirm("Bu projeyi yerel veritabanından silmek istiyor musun?")) return;
     setBusy(true);
@@ -471,6 +503,31 @@ function App() {
                             <span>{studio.data.musical.tempoMap.length} tempo noktası</span>
                           </div>
                           <button type="submit" className="primary-button" disabled={busy}>Müzik ayarlarını kaydet</button>
+                        </form>
+                        <form className="music-arrangement-form" onSubmit={(event) => void saveMusicArrangement(event, studio.id)}>
+                          <div className="music-form-heading">
+                            <strong>Song Arrangement & Lyrics</strong>
+                            <span>Bölüm sırası, ölçü uzunluğu ve özgün sözler</span>
+                          </div>
+                          <div className="arrangement-section-list">
+                            {studio.data.arrangement.sections.map((section, index) => (
+                              <fieldset className="arrangement-section" key={section.id}>
+                                <legend>{index + 1}. {section.type.replaceAll("_", " ").toUpperCase()}</legend>
+                                <div className="arrangement-section-fields">
+                                  <label>Bölüm adı<input name={`label:${section.id}`} defaultValue={section.label} maxLength={80} required /></label>
+                                  <label>Başlangıç ölçüsü<input name={`startBar:${section.id}`} type="number" min="1" max="10000" defaultValue={section.startBar} required /></label>
+                                  <label>Uzunluk (ölçü)<input name={`bars:${section.id}`} type="number" min="1" max="512" defaultValue={section.bars} required /></label>
+                                </div>
+                                <label>Sözler / notlar<textarea name={`lyrics:${section.id}`} defaultValue={section.lyrics ?? ""} rows={3} placeholder="Bu bölüme ait sözleri yaz..." /></label>
+                              </fieldset>
+                            ))}
+                          </div>
+                          <div className="music-session-summary">
+                            <span>{studio.data.arrangement.sections.length} bölüm</span>
+                            <span>{studio.data.arrangement.sections.reduce((max, section) => Math.max(max, section.startBar + section.bars - 1), 0)} toplam ölçü sınırı</span>
+                            <span>{studio.data.arrangement.sections.filter((section) => section.lyrics?.trim()).length} söz girilmiş bölüm</span>
+                          </div>
+                          <button type="submit" className="primary-button" disabled={busy}>Şarkı düzenini ve sözleri kaydet</button>
                         </form>
                       )}
                     </article>
