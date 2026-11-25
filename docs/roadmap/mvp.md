@@ -53,3 +53,23 @@
 
 ## Kabul ilkesi
 Bir özellik yalnızca tasarımı yazıldı diye tamamlanmış sayılmaz. Kodlanması, test edilmesi ve hedef cihazlarda doğrulanması gerekir. Özellik eşitliği kabul kriteridir; donanım performansının eşit olması şart değildir.
+
+## Music Studio PRO — Ayrı ürün modülü
+
+Music Studio PRO, video MVP'sinden ayrı bir profesyonel müzik üretim ve düzenleme modülü olarak planlandı. Ayrıntılı kapsam: [professional-spec.md](../music-studio/professional-spec.md).
+
+- [x] Ürün kapsamı ve mimari ilkeler dokümante edildi
+- [ ] Müzik proje manifesti tasarımı
+- [ ] Platform ses motoru teknik doğrulaması
+- [ ] BPM, ölçü, ton ve transport
+- [ ] Çok kanallı ses timeline'ı ve waveform
+- [ ] MIDI Piano Roll ve step sequencer
+- [ ] Drum machine, sampler ve sanal enstrümanlar
+- [ ] Ses kaydı ve Vocal Studio
+- [ ] Mixer, routing, otomasyon ve efektler
+- [ ] Mastering analizi, WAV/MP3/FLAC dışa aktarma
+- [ ] Stem export ve opsiyonel stem separation
+- [ ] İsteğe bağlı AI songwriting, composition ve music generation
+- [ ] Music Studio projesini Video Studio'ya aktarma
+
+Bu maddeler planlanan kapsamdır; henüz uygulanmış özellikler olarak değerlendirilmemelidir.
