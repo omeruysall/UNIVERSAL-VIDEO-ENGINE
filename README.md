@@ -1,27 +1,37 @@
 # UNIVERSAL VIDEO ENGINE
 
-Yerel öncelikli, modüler video üretim ve düzenleme platformu.
+Yerel öncelikli ve hibrit çalışan, profesyonel yaratıcı üretim stüdyoları platformu.
 
-**Ürün hedefi:** Android, iOS, Windows, macOS ve Linux üzerinde aynı temel özellikleri sunan; ortak proje formatı ve ortak üretim çekirdeği kullanan mobil + masaüstü uygulaması.
+**Ürün hedefi:** Android, iOS, Windows, macOS ve Linux üzerinde ortak proje formatı ve ortak üretim çekirdeğiyle video, müzik, ses, görsel, animasyon, 3D ve AI destekli üretim iş akışları sunmak.
 
-**Geliştirme ilkesi:** Temel işlevler kullanıcının kendi cihazında çalışır. Zorunlu bulut sunucusu, bulut veritabanı veya bulut medya depolama yoktur. GitHub yalnızca kaynak kodu, dokümantasyon ve sürüm yönetimi içindir.
+**Ürün kapsamı:** Video Studio, Music Studio PRO, Audio Studio, Image Studio, Animation Studio, 3D Studio, AI Studio, Voice Studio, Subtitle Studio, Asset Manager, Template Library ve Render Center.
+
+**Çalışma modeli:** Temel proje yönetimi, medya düzenleme ve desteklenen üretim işlemleri yerel çalışır. Harici AI ve bulut servisleri isteğe bağlıdır; kullanıcı onayı, sağlayıcı ve veri aktarımı açıklaması gerektirir. Bulut hesabı temel uygulama kullanımı için zorunlu değildir.
+
+**Geliştirme stratejisi:** Professional; modüller aşamalı geliştirilir ve yalnızca kodlanıp test edilip hedef platformlarda doğrulandıklarında tamamlandı sayılır.
+
+GitHub yalnızca kaynak kodu, dokümantasyon ve sürüm yönetimi içindir; kullanıcı medyası, proje verileri ve API anahtarları depoya gönderilmez.
 
 ## Proje durumu
+
 - Aşama: V5.6 — Local Persistence, Migrations & API Test Foundation
 - Ortak arayüz: React + TypeScript
-- Ortak proje modeli ve runtime guard: `packages/core`
+- Ortak proje modeli: `packages/core`
 - Yerel geliştirme API'si: Python + FastAPI
 - Yerel veritabanı: SQLite
-- Medya işleme hedefi: platform adaptörü üzerinden yerel FFmpeg
+- Medya işleme hedefi: platform adaptörleri üzerinden yerel medya motorları
+- Music Studio PRO ve diğer stüdyolar: ürün kapsamı/yol haritası; henüz tamamlanmış özellikler değildir
 
 ## Hedef platformlar
+
 - Mobil: Android ve iOS
 - Masaüstü: Windows, macOS ve Linux
-- Geliştirme: yerel tarayıcı arayüzü
+- Geliştirme: Codespaces veya yerel geliştirme ortamı
 
-Mobil ve PC için ayrı ürün mantıkları oluşturulmayacak. Responsive arayüz, ortak proje şeması, ortak timeline modeli ve platform adaptörleri kullanılacak. Özellik eşitliği hedeflenir; donanım ve işletim sistemi farklılıkları nedeniyle performans aynı olmak zorunda değildir.
+Ortak UI, proje şeması, asset sistemi ve modül iş akışları kullanılacak. Özellik eşitliği hedeflenir; performans donanım ve işletim sistemine göre değişebilir.
 
 ## Mevcut kod kapsamı
+
 - Yerel API sağlık kontrolü
 - Sürümlü SQLite migration altyapısı (ilk migration)
 - SQLite proje kayıt tablosu
@@ -29,49 +39,20 @@ Mobil ve PC için ayrı ürün mantıkları oluşturulmayacak. Responsive arayü
 - Proje oluşturma arayüzü
 - Konu veya hazır prompt girişi
 - Hazır promptun kaynak metnini dönüştürmeden saklama
-- Video, ses, görsel ve animasyon çıktı türleri için formata uygun ayarlar
+- Video, ses, görsel ve animasyon çıktı türleri için temel ayarlar
 - Ana video, seslendirme, altyazı, ekran yazısı ve metadata için bağımsız çoklu dil ayarları
-- Kayıtlı projeyi açma ve temel bilgilerini görüntüleme
 - Ortak TypeScript proje manifesti ve runtime doğrulayıcısı
 
-**Test durumu:** Kod GitHub'a kaydedildi. Henüz Android, iOS veya masaüstü cihazda derleme/çalıştırma ve kabul testleri tamamlanmadı. Bu nedenle bu özellikler yerel ortamda doğrulanmış sayılmaz.
+**Test durumu:** Kodlanmış özellikler, hedef mobil ve masaüstü cihazlarda doğrulanmış ürün özellikleri olarak değerlendirilmemelidir. Test ve kabul aşamaları yol haritasında ayrıca izlenir.
 
-## Yerel mimari
-- Shared UI: React + TypeScript
-- Shared Core: proje, prompt, timeline, dil, çıktı ve iş akışı kuralları
-- Mobil kabuk: Capacitor PoC (teknik doğrulama gerekli)
-- Masaüstü kabuk: Tauri PoC (teknik doğrulama gerekli)
-- Platform adaptörleri: dosya sistemi, SQLite, medya seçici, arka plan işi ve render
-- FastAPI: ilk geliştirme/yerel worker bileşeni; mobil uygulama Termux veya harici Python kurulumuna bağımlı olmayacak
+## Ana dokümantasyon
 
-## İlk MVP
-1. Ortak proje şeması ve yerel uygulama iskeleti
-2. Proje oluşturma, listeleme, kaydetme ve yeniden açma
-3. Konu veya hazır prompt girişi (hazır prompt birebir korunur)
-4. Video çıktı ayarları
-5. Medyayı yerel depoya alma
-6. Basit çok kanallı timeline
-7. FFmpeg ile yerel MP4 dışa aktarma
-8. İşlem durumu ve temel kalite kontrolü
-9. Aynı proje dosyasını mobil ve PC arasında aktararak açma testi
-
-## Geliştirme ilkeleri
-- Önce yerel ve çevrimdışı temel işlevler.
-- Harici AI sağlayıcıları zorunlu değildir; opsiyonel adaptörlerdir.
-- Kullanıcı onayı olmadan ücretli servis veya dış ağa veri gönderimi yapılmaz.
-- API anahtarları, kişisel medya ve veritabanı GitHub'a gönderilmez.
-- Ağ erişimi gerektiren özellikler açıkça belirtilir ve varsayılan olarak kapalıdır.
-- Büyük AI modelleri ve ağır 3D/render işlemleri cihaz kapasitesine göre sınırlandırılır.
-- Her ortak özellik mobil ve masaüstünde aynı kabul senaryolarıyla test edilir.
-
-## Dokümantasyon
-- docs/architecture/overview.md
-- docs/architecture/platform-parity.md
-- packages/core/schema/project-manifest.v1.schema.json
-- docs/development/local-first.md
-- docs/development/project-persistence.md
-- docs/development/local-testing.md
-- docs/roadmap/mvp.md
-- docs/security/local-security.md
+- `docs/architecture/overview.md`
+- `docs/architecture/platform-parity.md`
+- `docs/development/local-first.md`
+- `docs/development/project-persistence.md`
+- `docs/roadmap/mvp.md`
+- `docs/music-studio/professional-spec.md`
+- `docs/security/local-security.md`
 
 Lisans henüz seçilmedi. Lisans kararı verilene kadar tüm haklar saklıdır.
