@@ -1,54 +1,78 @@
 # Mimari Genel Bakış
 
-## Tasarım kararı
-UNIVERSAL VIDEO ENGINE; Android, iOS, Windows, macOS ve Linux üzerinde ortak özellikler sunacak şekilde tasarlanır. Mobil ve masaüstü için ayrı iş mantıkları geliştirilmez. Responsive React arayüzü, platformdan bağımsız Shared Core ve platform adaptörleri kullanılır.
+## Ürün kararı
 
-Uygulama local-first'tir. Kullanıcı projeleri, veritabanı, medya varlıkları, timeline ve render çıktıları varsayılan olarak cihazda tutulur.
+UNIVERSAL VIDEO ENGINE; Android, iOS, Windows, macOS ve Linux hedeflerinde profesyonel yaratıcı üretim stüdyolarını tek bir platformda birleştirir.
+
+**Kapsam:** Video Studio, Music Studio PRO, Audio Studio, Image Studio, Animation Studio, 3D Studio, AI Studio, Voice Studio, Subtitle Studio, Asset Manager, Template Library ve Render Center.
+
+**Geliştirme stratejisi:** Professional. Hedef, yalnızca arayüz demosu değil; gerçek üretim iş akışları, güvenilir proje saklama, düzenleme, miksaj, render, test ve platform paketlemesidir. Geliştirme aşamalıdır; her modülün tamamlanma durumu ayrı izlenir.
+
+**Çalışma modeli:** Hybrid. Proje yönetimi, medya düzenleme, timeline, temel ses işleme ve desteklenen render görevleri öncelikle yerel çalışır. Harici AI sağlayıcıları, bulut tabanlı üretim ve ağır çevrimiçi görevler isteğe bağlıdır. Kullanıcı açıkça onaylamadan içerik veya proje verisi harici sağlayıcıya gönderilmez.
 
 ## Mimari katmanlar
-- Shared UI: React + TypeScript; telefon, tablet ve masaüstüne uyumlu.
-- Shared Core: platformdan bağımsız proje modeli, prompt kuralları, timeline, dil/çıktı ayarları, doğrulama ve iş akışı.
-- Platform Shell: mobilde Capacitor, masaüstünde Tauri hedeflenir; her ikisi de teknik PoC ile doğrulanacaktır.
-- Platform Adapters: dosya sistemi, SQLite, medya seçici/izinler, bildirim, arka plan işi ve render yürütücüsü.
-- Local API/Worker: FastAPI ilk geliştirme ve masaüstü yerel worker için kullanılabilir.
-- Media Engine: FFmpeg tabanlı ortak render planı; platforma uygun yerel yürütücü.
-- Database: SQLite; proje ve işlem metaverileri.
-- Media storage: uygulama tarafından yönetilen yerel klasörler.
 
-Mobil ürünün çalışması Termux veya harici Python kurulumuna bağımlı olmayacaktır. Mobilde ihtiyaç duyulan yerel işlemler uygulama içine paketlenen veya native platform adaptörleriyle sağlanacaktır.
+- **Shared UI:** React + TypeScript; telefon, tablet ve masaüstüne uyumlu.
+- **Shared Core:** Platformdan bağımsız proje modeli, prompt kuralları, timeline, medya grafiği, dil/çıktı ayarları, doğrulama, görev durumları ve iş akışı.
+- **Studio Modules:** Video, Music, Audio, Image, Animation, 3D, AI, Voice ve Subtitle stüdyoları. Modüller bağımsız kullanıcı iş akışlarına sahip olur; ortak proje, asset, görev ve render altyapısını paylaşır.
+- **Platform Shell:** Mobilde Capacitor, masaüstünde Tauri hedeflenir; her ikisi de teknik PoC ile doğrulanacaktır.
+- **Platform Adapters:** Dosya sistemi, SQLite, medya seçici/izinler, ses girişi/çıkışı, GPU/codec yetenekleri, bildirim, arka plan işi ve render yürütücüsü.
+- **Local Engines:** Medya decode/encode, video render, gerçek zamanlı ses motoru, MIDI, waveform, thumbnail/proxy ve yerel AI runtime adaptörleri.
+- **Provider Gateway:** İsteğe bağlı harici AI servisleri için tek sağlayıcı arayüzü; sağlayıcı seçimi, yetenek kontrolü, maliyet/limit bilgisi, gizlilik bildirimi, onay, hata ve görev durumu yönetimi.
+- **Local API/Worker:** FastAPI mevcut geliştirme/yerel worker bileşeni olarak kullanılabilir. Nihai mobil uygulama Termux veya harici Python kurulumuna bağımlı olmayacaktır.
+- **Database:** SQLite; proje, asset metaverisi, görev geçmişi, ayarlar ve yerel katalog.
+- **Media storage:** Uygulama tarafından yönetilen yerel proje klasörleri. Bulut medya depolaması zorunlu değildir.
+
+## Hybrid görev yönlendirme
+
+Her üretim görevi çalıştırılmadan önce çalışma yolu belirlenir:
+1. Yerel motor destekliyorsa ve cihaz yeterliyse yerel işlem.
+2. Yerel motor uygun değilse, kullanıcı isterse bağlı harici sağlayıcı.
+3. Kullanıcı harici sağlayıcıyı onaylamazsa görev yerel alternatif, daha düşük kalite/çözünürlük veya desteklenmiyor açıklamasıyla sunulur.
+
+Harici AI görevleri için sağlayıcı adı, gönderilecek veri türleri, tahmini ücret veya ücretsiz kota bilgisi (sağlayıcı sunuyorsa), internet gereksinimi ve saklama koşulları işlem öncesi gösterilir. API anahtarları güvenli platform depolarında tutulur; GitHub'a yazılmaz.
 
 ## Veri akışı
-1. Kullanıcı ortak arayüzden proje oluşturur.
-2. Shared Core platformdan bağımsız proje modelini doğrular.
-3. Platformun SQLite adaptörü proje metaverisini kaydeder.
-4. Dosyalar doğrulanır ve yerel medya deposuna alınır.
-5. Timeline klipleri mutlak dosya yolları yerine asset kimliklerine referans verir.
-6. Ortak render planı cihaz yeteneklerine göre platform render adaptörüne iletilir.
-7. Render işi yerel kuyruğa alınır; worker/adapter çıktıyı yerel export alanına yazar.
 
-## Platformlar arası proje taşınabilirliği
+1. Kullanıcı ortak arayüzden bir stüdyo projesi oluşturur.
+2. Shared Core proje manifestini ve modül verisini doğrular.
+3. Platform SQLite adaptörü proje metaverisini kaydeder.
+4. Medya dosyaları doğrulanır ve yerel medya deposuna alınır.
+5. Timeline ve stüdyo grafikleri mutlak dosya yolları yerine asset kimliklerine referans verir.
+6. Görev yönlendiricisi yerel motor veya kullanıcının onayladığı sağlayıcıyı seçer.
+7. Render/AI işleri kuyruk, ilerleme, iptal, hata ve kurtarma durumlarıyla izlenir.
+8. Çıktılar varsayılan olarak yerel export alanına yazılır.
+
+## Ortak proje ve modül sistemi
+
 - Proje manifesti sürümlü ve platformdan bağımsızdır.
-- Medya, asset ID ve göreli yol ile ilişkilendirilir; mutlak yol kalıcı kimlik olarak kullanılmaz.
-- Proje paketi ve gerekli medya başka cihaza aktarılabilir.
-- Eksik medya için relink akışı sağlanır.
-- Bulut senkronizasyonu zorunlu değildir.
+- Proje, bir veya daha fazla stüdyo belgesi içerebilir: video timeline, music session, audio session, image document, animation scene veya 3D scene.
+- Modül belgeleri ortak asset kimlikleri, medya metaverisi, renk/ölçü birimleri, dil bilgisi ve render profilleriyle ilişkilendirilir.
+- Bir stüdyoda üretilen asset başka stüdyoda kullanılabilir; kaynak proje tahrip edilmez.
+- Medya, asset ID ve göreli yol ile ilişkilendirilir; mutlak yol kalıcı kimlik değildir.
+- Proje paketi ve gerekli medya başka cihaza aktarılabilir; eksik medya için relink akışı sağlanır.
+- Bulut senkronizasyonu zorunlu değildir. İsteğe bağlı senkronizasyon ayrı bir özellik ve açık kullanıcı tercihi olacaktır.
 
 ## Güven sınırları
-- Yerel servisler varsayılan olarak yalnızca 127.0.0.1 üzerinde dinler; 0.0.0.0 kullanılmaz.
-- CORS yalnızca gerekli yerel arayüz origin'ine izin verir.
-- Dosya adı ve uzantısı tek başına güvenilir kabul edilmez; MIME, imza, boyut ve süre doğrulanır.
+
+- Yerel servisler varsayılan olarak yalnızca 127.0.0.1 üzerinde dinler.
+- CORS yalnızca gerekli origin'lere izin verir.
+- Dosya adı/uzantısı tek başına güvenilir kabul edilmez; MIME, imza, boyut ve süre doğrulanır.
 - Dosya yolları proje kökü dışına çıkamayacak şekilde normalize edilir.
-- Shell komutları kullanıcı girdisiyle birleştirilmez; FFmpeg argümanları güvenli argüman dizisi olarak gönderilir.
-- API anahtarları ve kişisel medya GitHub'a eklenmez.
+- Shell komutları kullanıcı girdisiyle birleştirilmez; medya motoru argümanları güvenli argüman dizisi olarak gönderilir.
+- API anahtarları, kişisel medya ve kullanıcı proje verisi GitHub'a eklenmez.
+- Harici sağlayıcıya veri gönderimi açık kullanıcı onayı gerektirir.
 
-## Çevrimdışı sınırı
-Proje yönetimi, medya kataloğu, timeline ve yerel FFmpeg işlemleri internet olmadan çalışacak şekilde hedeflenir. Harici AI modelleri veya platformlara yayın gibi özellikler internet gerektirebilir; bunlar temel yerel işlevlerden ayrıdır ve isteğe bağlıdır.
+## Platformlar arası özellik ve performans
 
-## Özellik eşitliği ve performans
-Ortak temel özellikler bütün hedef platformlarda aynı kabul testlerinden geçmelidir. Ancak performans eşitliği garanti edilmez. Mobilde proxy/thumbnail, düşük çözünürlüklü önizleme, sınırlı eşzamanlı render ve depolama/ısı kontrolü uygulanabilir. Masaüstünde donanım hızlandırma ve daha yüksek render profilleri desteklenebilir; önce cihaz yetenekleri doğrulanır.
+Ortak proje davranışı tüm hedef platformlarda aynı kabul testlerinden geçmelidir. Performans ve donanım kapasitesi eşit olmak zorunda değildir. Mobilde proxy/thumbnail, düşük çözünürlüklü önizleme, sınırlı eşzamanlı render ve ısı/depolama kontrolü uygulanabilir. Masaüstünde donanım hızlandırma ve daha yüksek render profilleri desteklenebilir.
 
 ## Mobil gerçekçilik
-Galaxy A53 gibi orta sınıf cihazlarda işlemci, RAM, depolama, ısı ve Android arka plan kısıtları dikkate alınır. Büyük çözünürlükte render, ağır efektler ve büyük AI modelleri için kaynak sınırları gerekir.
 
-## Ayrıntılı karar
-Mobil ve masaüstü eşitliği, paketleme yaklaşımı, ortak proje biçimi ve kabul testleri için docs/architecture/platform-parity.md dosyasına bakın.
+Orta sınıf cihazlarda CPU, RAM, depolama, ısı, batarya ve işletim sistemi arka plan kısıtları dikkate alınır. Büyük AI modelleri, yüksek çözünürlüklü render, ağır efektler ve çok kanallı gerçek zamanlı ses işlemleri için cihaz yetenek kontrolü ve kademeli kalite profilleri gerekir.
+
+## Ayrıntılı kararlar
+
+- Platform eşitliği: [platform-parity.md](platform-parity.md)
+- Müzik stüdyosu: [../music-studio/professional-spec.md](../music-studio/professional-spec.md)
+- Yerel ve hibrit geliştirme ilkeleri: [../development/local-first.md](../development/local-first.md)
