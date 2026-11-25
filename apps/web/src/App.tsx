@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import type { FormEvent } from "react";
-import { isProjectManifest, isProjectManifestV2, migrateProjectV1ToV2 } from "@uve/core";
+import { createMusicStudioDocument, isProjectManifest, isProjectManifestV2, migrateProjectV1ToV2 } from "@uve/core";
 import type { OutputKind, OutputSettings, ProjectManifest, ProjectManifestV2, StudioType, VideoOrientation } from "@uve/core";
 
 const API = "http://127.0.0.1:8000/api/v1";
@@ -209,16 +209,19 @@ function App() {
   async function addStudio(studioType: StudioType) {
     if (!selected || selected.manifest.schemaVersion !== 2) return;
     const timestamp = now();
-    const document = {
-      id: crypto.randomUUID(),
-      studioType,
-      documentVersion: 1,
-      title: `${STUDIO_LABELS[studioType]} ${selected.manifest.studios.filter((studio) => studio.studioType === studioType).length + 1}`,
-      createdAt: timestamp,
-      updatedAt: timestamp,
-      assetIds: [],
-      data: {},
-    };
+    const title = `${STUDIO_LABELS[studioType]} ${selected.manifest.studios.filter((studio) => studio.studioType === studioType).length + 1}`;
+    const document = studioType === "music"
+      ? createMusicStudioDocument(crypto.randomUUID(), title, timestamp)
+      : {
+          id: crypto.randomUUID(),
+          studioType,
+          documentVersion: 1,
+          title,
+          createdAt: timestamp,
+          updatedAt: timestamp,
+          assetIds: [],
+          data: {},
+        };
     await saveManifest({
       ...selected.manifest,
       studios: [...selected.manifest.studios, document],
