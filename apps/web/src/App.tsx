@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { FormEvent } from "react";
-import { isProjectManifest } from "@uve/core";
-import type { OutputKind, OutputSettings, ProjectManifest, VideoOrientation } from "@uve/core";
+import { isProjectManifest, isProjectManifestV2, migrateProjectV1ToV2 } from "@uve/core";
+import type { OutputKind, OutputSettings, ProjectManifest, ProjectManifestV2, StudioType, VideoOrientation } from "@uve/core";
 
 const API = "http://127.0.0.1:8000/api/v1";
 
@@ -13,7 +13,16 @@ type ProjectSummary = {
   created_at: string;
   updated_at: string;
 };
-type StoredProject = ProjectSummary & { manifest: ProjectManifest };
+type StoredProject = ProjectSummary & { manifest: ProjectManifest | ProjectManifestV2 };
+
+const STUDIO_LABELS: Record<StudioType, string> = {
+  video: "Video Studio",
+  music: "Music Studio",
+  audio: "Audio Studio",
+  image: "Image Studio",
+  animation: "Animation Studio",
+  "3d": "3D Studio",
+};
 
 const now = () => new Date().toISOString();
 const parseLanguageList = (value: string) =>
@@ -95,7 +104,7 @@ function App() {
       : outputKind === "image"
         ? { kind: "image", format, orientation, width, height }
         : { kind: outputKind, format, orientation, width, height, fps };
-    const manifest: ProjectManifest = {
+    const legacyManifest: ProjectManifest = {
       schemaVersion: 1,
       id,
       title: title.trim(),
@@ -117,8 +126,12 @@ function App() {
     };
 
     try {
-      if (!isProjectManifest(manifest)) {
+      if (!isProjectManifest(legacyManifest)) {
         throw new Error("Proje verisi ortak proje şemasından geçemedi.");
+      }
+      const manifest = migrateProjectV1ToV2(legacyManifest);
+      if (!manifest || !isProjectManifestV2(manifest)) {
+        throw new Error("Proje v2 veri sözleşmesine dönüştürülemedi.");
       }
       const response = await fetch(`${API}/projects`, {
         method: "POST",
@@ -155,6 +168,61 @@ function App() {
     } finally {
       setBusy(false);
     }
+  }
+
+  async function saveManifest(manifest: ProjectManifest | ProjectManifestV2) {
+    if (!selected) return;
+    setBusy(true);
+    setMessage("");
+    try {
+      const updated = { ...manifest, updatedAt: now() };
+      const response = await fetch(`${API}/projects/${selected.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: selected.id, title: updated.title, manifest: updated }),
+      });
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        throw new Error(body.detail ?? "Proje güncellenemedi");
+      }
+      const saved = await response.json() as StoredProject;
+      setSelected(saved);
+      await refreshProjects();
+      setMessage("Proje güncellendi ve yerel veritabanına kaydedildi.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Bilinmeyen hata");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function upgradeSelectedProject() {
+    if (!selected || selected.manifest.schemaVersion !== 1) return;
+    const migrated = migrateProjectV1ToV2(selected.manifest);
+    if (!migrated || !isProjectManifestV2(migrated)) {
+      setMessage("Bu proje güvenli şekilde v2'ye dönüştürülemedi. Orijinal kayıt korunuyor.");
+      return;
+    }
+    await saveManifest(migrated);
+  }
+
+  async function addStudio(studioType: StudioType) {
+    if (!selected || selected.manifest.schemaVersion !== 2) return;
+    const timestamp = now();
+    const document = {
+      id: crypto.randomUUID(),
+      studioType,
+      documentVersion: 1,
+      title: `${STUDIO_LABELS[studioType]} ${selected.manifest.studios.filter((studio) => studio.studioType === studioType).length + 1}`,
+      createdAt: timestamp,
+      updatedAt: timestamp,
+      assetIds: [],
+      data: {},
+    };
+    await saveManifest({
+      ...selected.manifest,
+      studios: [...selected.manifest.studios, document],
+    });
   }
 
   async function deleteProject(id: string) {
@@ -320,6 +388,37 @@ function App() {
           </div>
           <div className="prompt-preview"><small>Dil yapılandırması</small><p>Ana video: {selected.manifest.languages.video} · Seslendirme: {selected.manifest.languages.voiceover.join(", ") || "Yok"} · Altyazı: {selected.manifest.languages.subtitles.join(", ") || "Yok"} · Ekran yazısı: {selected.manifest.languages.onScreenText.join(", ") || "Yok"} · Metadata: {selected.manifest.languages.metadata.join(", ") || "Yok"}</p></div>
           {selected.manifest.prompt && <div className="prompt-preview"><small>Kaydedilen girdi</small><p>{selected.manifest.prompt.mode === "ready_prompt" ? selected.manifest.prompt.originalText : selected.manifest.prompt.topic}</p></div>}
+          <div className="studio-area">
+            <div className="studio-area-heading">
+              <div><small>PROJECT STUDIO REGISTRY</small><h3>Proje stüdyoları</h3></div>
+              <span className="tag">MANIFEST V{selected.manifest.schemaVersion}</span>
+            </div>
+            {selected.manifest.schemaVersion === 1 ? (
+              <div className="upgrade-panel">
+                <p>Bu proje eski v1 biçiminde. İçeriği değiştirmeden v2'ye yükselterek bağımsız stüdyo belgeleri ekleyebilirsin. Dönüşüm yalnızca bu düğmeye bastığında kaydedilir.</p>
+                <button className="primary-button" type="button" onClick={() => void upgradeSelectedProject()} disabled={busy}>Projeyi v2'ye yükselt</button>
+              </div>
+            ) : (
+              <>
+                <div className="studio-grid">
+                  {selected.manifest.studios.length === 0 ? <p className="empty-state">Bu projede henüz stüdyo belgesi yok. Aşağıdan bir stüdyo oluştur.</p> : selected.manifest.studios.map((studio) => (
+                    <article className="studio-card" key={studio.id}>
+                      <div><small>{STUDIO_LABELS[studio.studioType]}</small><strong>{studio.title}</strong><span>{Object.keys(studio.data).length} veri alanı · Sürüm {studio.documentVersion}</span></div>
+                      <span className="studio-state">BELGE OLUŞTURULDU</span>
+                    </article>
+                  ))}
+                </div>
+                <div className="studio-create">
+                  <p>Yeni stüdyo belgesi oluştur</p>
+                  <div className="studio-create-buttons">
+                    {(Object.keys(STUDIO_LABELS) as StudioType[]).map((studioType) => (
+                      <button key={studioType} type="button" className="secondary-button" disabled={busy} onClick={() => void addStudio(studioType)}>+ {STUDIO_LABELS[studioType]}</button>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
         </section>
       )}
 
