@@ -74,5 +74,6 @@ Orta sınıf cihazlarda CPU, RAM, depolama, ısı, batarya ve işletim sistemi a
 ## Ayrıntılı kararlar
 
 - Platform eşitliği: [platform-parity.md](platform-parity.md)
+- Ortak proje manifesti v2 tasarımı: [project-manifest-v2-design.md](project-manifest-v2-design.md)
 - Müzik stüdyosu: [../music-studio/professional-spec.md](../music-studio/professional-spec.md)
 - Yerel ve hibrit geliştirme ilkeleri: [../development/local-first.md](../development/local-first.md)
