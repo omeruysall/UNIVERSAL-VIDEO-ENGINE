@@ -40,15 +40,20 @@ function isStudioType(value: unknown): value is StudioType {
     (STUDIO_TYPES as readonly string[]).includes(value);
 }
 
+function isIsoDateTime(value: string): boolean {
+  return /^\\d{4}-\\d{2}-\\d{2}T/.test(value) &&
+    Number.isFinite(Date.parse(value));
+}
+
 export function isStudioDocument(value: unknown): value is StudioDocument {
   if (!isRecord(value)) return false;
   if (
     typeof value.id !== "string" || value.id.trim().length === 0 ||
     !isStudioType(value.studioType) ||
     !Number.isInteger(value.documentVersion) || (value.documentVersion as number) < 1 ||
-    typeof value.title !== "string" ||
-    typeof value.createdAt !== "string" ||
-    typeof value.updatedAt !== "string" ||
+    typeof value.title !== "string" || value.title.trim().length === 0 ||
+    typeof value.createdAt !== "string" || !isIsoDateTime(value.createdAt) ||
+    typeof value.updatedAt !== "string" || !isIsoDateTime(value.updatedAt) ||
     !isRecord(value.data)
   ) return false;
 
@@ -74,8 +79,24 @@ export function isProjectManifestV2(value: unknown): value is ProjectManifestV2 
   const studios = value.studios;
   if (!studios.every(isStudioDocument)) return false;
 
-  const ids = studios.map((studio) => (studio as StudioDocument).id);
-  return new Set(ids).size === ids.length;
+  const studioIds = studios.map((studio) => (studio as StudioDocument).id);
+  if (new Set(studioIds).size !== studioIds.length) return false;
+
+  // A studio may only reference assets registered in the shared project manifest.
+  const assets = value.assets;
+  if (!Array.isArray(assets)) return false;
+  const assetIds = new Set<string>();
+  for (const asset of assets) {
+    if (!isRecord(asset) || typeof asset.id !== "string" || asset.id.trim().length === 0) {
+      return false;
+    }
+    if (assetIds.has(asset.id)) return false;
+    assetIds.add(asset.id);
+  }
+
+  return studios.every((studio) =>
+    ((studio as StudioDocument).assetIds ?? []).every((assetId) => assetIds.has(assetId))
+  );
 }
 
 /**
