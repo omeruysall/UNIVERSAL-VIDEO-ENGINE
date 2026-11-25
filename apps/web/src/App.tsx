@@ -483,6 +483,7 @@ function App() {
                       <div><small>{STUDIO_LABELS[studio.studioType]}</small><strong>{studio.title}</strong><span>{Object.keys(studio.data).length} veri alanı · Sürüm {studio.documentVersion}</span></div>
                       <span className="studio-state">BELGE OLUŞTURULDU</span>
                       {studio.studioType === "music" && isMusicStudioData(studio.data) && (
+                        <>
                         <form className="music-settings-form" onSubmit={(event) => void saveMusicSettings(event, studio.id)}>
                           <div className="music-form-heading"><strong>Music Studio · Session Setup</strong><span>Temel müzik oturumu ayarları</span></div>
                           <div className="music-settings-grid">
@@ -529,6 +530,7 @@ function App() {
                           </div>
                           <button type="submit" className="primary-button" disabled={busy}>Şarkı düzenini ve sözleri kaydet</button>
                         </form>
+                        </>
                       )}
                     </article>
                   ))}
