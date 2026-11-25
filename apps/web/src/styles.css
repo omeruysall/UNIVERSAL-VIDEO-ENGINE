@@ -54,3 +54,20 @@ legend{margin-bottom:9px;color:#cbd4e2;font-size:12px;font-weight:650}
 .prompt-preview p{white-space:pre-wrap;overflow-wrap:anywhere;color:#c6d0df;font-size:12px;line-height:1.6}
 footer{display:flex;justify-content:space-between;gap:16px;margin-top:28px;padding-top:18px;border-top:1px solid #293140;color:#77869e;font-size:10px}
 @media(max-width:680px){.shell{width:min(100% - 28px,520px);padding-top:18px}.hero{padding:42px 0 26px}.hero h2{letter-spacing:-1.8px}.workspace{padding:17px}.settings-grid,.language-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.details-grid{grid-template-columns:1fr}.project-row{align-items:flex-start;flex-direction:column}.row-actions{width:100%}.row-actions button{flex:1}footer{flex-direction:column}.status-address{margin-left:auto}}
+
+.studio-area{margin-top:22px;padding-top:20px;border-top:1px solid #2c394c}
+.studio-area-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:15px}
+.studio-area-heading small,.studio-create>p{color:#8da2c3;font-size:10px;font-weight:750;letter-spacing:1.2px}
+.studio-area-heading h3{margin:5px 0 0;font-size:19px}
+.studio-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.studio-card{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border:1px solid #34445d;border-radius:10px;background:#111a27}
+.studio-card>div{display:grid;gap:5px;min-width:0}
+.studio-card strong{font-size:13px;overflow-wrap:anywhere}
+.studio-card span{color:#8997ac;font-size:10px}
+.studio-state{flex-shrink:0;color:#8fd9b6!important;font-size:9px!important;letter-spacing:.5px}
+.studio-create{margin-top:17px}
+.studio-create>p{margin:0 0 10px}
+.studio-create-buttons{display:flex;gap:8px;flex-wrap:wrap}
+.upgrade-panel{padding:15px;border:1px solid #695a36;border-radius:10px;background:#211d14}
+.upgrade-panel p{margin:0 0 13px;color:#d8c99e;font-size:12px;line-height:1.6}
+@media(max-width:680px){.studio-grid{grid-template-columns:1fr}.studio-card{align-items:flex-start;flex-direction:column}.studio-state{align-self:flex-start}}
